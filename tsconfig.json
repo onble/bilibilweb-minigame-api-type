@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        // 基础编译配置（根据你的项目需求调整）
+        "target": "ES6",
+        "module": "CommonJS",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    // 【关键】指定需要 TypeScript 检测的文件/目录（仅包含源码目录）
+    "include": [
+        "types/**/*" // 只检测 types 目录下的所有文件（你的声明文件源码目录）
+    ],
+    // 【关键】排除不需要检测的文件/目录
+    "exclude": [
+        "dist/**/*", // 排除 dist 目录下所有文件（包含其中的 .d.ts）
+        "node_modules", // 常规排除 node_modules
+    ]
+}
