@@ -68,6 +68,58 @@ declare namespace BilibilWebMinigame {
 
         //#endregion 更新
 
+        //#region 生命周期
+        /**
+         * 取消监听小游戏回到前台的事件
+         * @param callback 要取消的、已绑定的小游戏前台事件回调函数
+         */
+        offShow: (callback: (res: OnShowCallbackResult) => void) => void;
+
+        /**
+         * 监听小游戏回到前台的事件
+         * @param callback 小游戏回到前台时触发的回调函数
+         */
+        onShow: (callback: (res: OnShowCallbackResult) => void) => void;
+
+        /**
+         * 取消监听小游戏隐藏到后台的事件
+         * @param callback 要取消的、已绑定的小游戏后台事件回调函数
+         */
+        offHide: (callback: () => void) => void;
+
+        /**
+         * 监听小游戏隐藏到后台的事件
+         * @description 锁屏、按 HOME 键退到桌面等操作会触发此事件
+         * @param callback 小游戏隐藏到后台时触发的回调函数
+         */
+        onHide: (callback: () => void) => void;
+        /**
+         * 退出当前小游戏
+         * @param object 接口调用配置项，包含成功/失败/完成回调
+         */
+        exitMiniProgram: (object: ExitMiniProgramOptions) => void;
+
+        /**
+         * 获取本次小游戏启动时的参数（异步版本）
+         * @description 冷启动返回值与回调参数一致；热启动返回值与 App.onShow 一致
+         * @param options 接口调用配置项，包含成功/失败回调
+         */
+        getLaunchOptions: (options: GetLaunchOptionsOptions) => void;
+
+        /**
+         * 获取本次小游戏启动时的参数（同步版本）
+         * @description 冷启动返回值与自身返回值一致；热启动返回值与 App.onShow 一致
+         * @returns 启动参数信息
+         */
+        getLaunchOptionsSync: () => LaunchOptionsResult;
+
+        /**
+         * 获取小游戏打开的参数（包括冷启动和热启动）
+         * @returns 启动参数信息
+         */
+        getEnterOptionsSync: () => LaunchOptionsResult;
+        //#endregion 生命周期
+
         //#endregion 基础
     }
 }
