@@ -58,13 +58,6 @@ declare namespace BilibilWebMinigame {
          */
         getUpdateManager: () => UpdateManager;
 
-        /**
-         * 设置调试开关（含更新模块调试）
-         * @platform 基础库 2.6.0+
-         * @param options 调试配置项
-         */
-        setEnableDebug?: (options: SetEnableDebugOptions) => void;
-
         //#endregion 更新
 
         //#region 生命周期
@@ -159,6 +152,160 @@ declare namespace BilibilWebMinigame {
         onAudioInterruptionBegin: (callback: () => void) => void;
         //#endregion 应用级事件
 
+        //#region 触摸事件
+        /**
+         * 取消监听触点失效事件
+         * @param callback 要取消的、已绑定的触点失效事件回调函数
+         */
+        offTouchCancel: (
+            callback: (res: TouchEventCallbackResult) => void,
+        ) => void;
+
+        /**
+         * 监听触点失效事件
+         * @param callback 触点失效事件触发时的回调函数
+         */
+        onTouchCancel: (
+            callback: (res: TouchEventCallbackResult) => void,
+        ) => void;
+
+        /**
+         * 监听触摸结束事件
+         * @param callback 触摸结束事件触发时的回调函数
+         */
+        onTouchEnd: (callback: (res: TouchEventCallbackResult) => void) => void;
+
+        /**
+         * 取消监听触摸结束事件
+         * @param callback 要取消的、已绑定的触摸结束事件回调函数
+         */
+        offTouchEnd: (
+            callback: (res: TouchEventCallbackResult) => void,
+        ) => void;
+
+        /**
+         * 取消监听触点移动事件
+         * @param callback 要取消的、已绑定的触点移动事件回调函数
+         */
+        offTouchMove: (
+            callback: (res: TouchEventCallbackResult) => void,
+        ) => void;
+
+        /**
+         * 监听触点移动事件
+         * @param callback 触点移动事件触发时的回调函数
+         */
+        onTouchMove: (
+            callback: (res: TouchEventCallbackResult) => void,
+        ) => void;
+
+        /**
+         * 取消监听开始触摸事件
+         * @param callback 要取消的、已绑定的开始触摸事件回调函数
+         */
+        offTouchStart: (
+            callback: (res: TouchEventCallbackResult) => void,
+        ) => void;
+
+        /**
+         * 监听开始触摸事件
+         * @param callback 开始触摸事件触发时的回调函数
+         */
+        onTouchStart: (
+            callback: (res: TouchEventCallbackResult) => void,
+        ) => void;
+        //#endregion 触摸事件
+
+        //#region 性能
+        /**
+         * 加快触发 JavaScript 引擎垃圾回收（GC）
+         * @platform 基础库 3.12.0+，低版本需做兼容处理
+         * @description GC 时机由 JavaScript 引擎控制，调用后不保证马上触发 GC
+         */
+        triggerGC: () => void;
+        //#endregion 性能
+
+        //#region 分包加载
+        /**
+         * 触发分包加载
+         * @description 详细规则参考「分包加载」文档
+         * @param options 分包加载配置项（所有核心回调均为必填）
+         * @returns 加载分包任务实例，可用于监听加载进度
+         */
+        loadSubpackage: (options: LoadSubpackageOptions) => LoadSubpackageTask;
+        //#endregion 分包加载
+
+        //#region 定时器
+        /**
+         * 设定一个一次性定时器，定时到期后执行回调函数
+         * @param callback 定时到期后要执行的回调函数
+         * @param delay 延迟时间，单位为毫秒（ms），回调函数会在该延迟后执行
+         * @returns 定时器编号，可传递给 clearTimeout 取消该定时器
+         */
+        setTimeout: (callback: () => void, delay: number) => number;
+
+        /**
+         * 取消由 setTimeout 设置的一次性定时器
+         * @param timeoutID 要取消的定时器编号（由 setTimeout 返回）
+         */
+        clearTimeout: (timeoutID: number) => void;
+
+        /**
+         * 设定一个周期性定时器，按指定周期执行回调函数
+         * @param callback 每个周期要执行的回调函数
+         * @param delay 执行回调函数的时间间隔，单位为毫秒（ms）
+         * @returns 定时器编号，可传递给 clearInterval 取消该定时器
+         */
+        setInterval: (callback: () => void, delay: number) => number;
+
+        /**
+         * 取消由 setInterval 设置的周期性定时器
+         * @param intervalID 要取消的定时器编号（由 setInterval 返回）
+         */
+        clearInterval: (intervalID: number) => void;
+
+        //#endregion 定时器
+
+        //#region 调试
+        /**
+         * 设置是否打开调试开关（对正式版也生效）
+         * @platform 基础库 2.4.0+（基本调试开关）、3.6.0+（广告模块调试），低版本需做兼容处理
+         * @param options 调试开关配置项
+         * @example
+         * // 打开调试
+         * bl.setEnableDebug({
+         *     enableDebug: true,
+         * });
+         *
+         * // 关闭调试
+         * bl.setEnableDebug({
+         *     enableDebug: false,
+         * });
+         *
+         * // 更新模块调试
+         * bl.setEnableDebug({
+         *     debugModule: [{
+         *         name: 'update',
+         *         enable: true, // 是否开启更新调试, 默认 false
+         *         mode: 'success'// 调试模式，支持 'success'、'fail', 默认 'success'
+         *     }]
+         * });
+         */
+        setEnableDebug: (options: SetEnableDebugOptions) => void;
+
+        /**
+         * 获取日志管理器对象
+         * @platform 基础库 3.11.0+，低版本需做兼容处理
+         * @returns 日志管理器实例
+         * @example
+         * const logger = bl.getLogManager()
+         * logger.log({str: 'hello world'}, 'basic log', 100, [1, 2, 3])
+         * logger.info({str: 'hello world'}, 'info log', 100, [1, 2, 3])
+         * logger.debug({str: 'hello world'}, 'debug log', 100, [1, 2, 3])
+         * logger.warn({str: 'hello world'}, 'warn log', 100, [1, 2, 3])
+         */
+        getLogManager: () => LogManager;
+        //#endregion 调试
         //#endregion 基础
     }
     /**
@@ -169,6 +316,66 @@ declare namespace BilibilWebMinigame {
         message: string;
         /** 错误调用堆栈信息 */
         stack: string;
+    }
+    /**
+     * 调试模块配置项（debugModule 数组元素类型）
+     * @platform 基础库 3.6.0+ 支持
+     */
+    interface DebugModule {
+        /** 模块名称（如 'update'/'ad' 等） */
+        name: string;
+        /** 是否开启该模块调试，默认 false */
+        enable?: boolean;
+        /** 调试模式（不同模块支持的模式不同，如 update 支持 'success'/'fail'） */
+        mode?: string;
+    }
+
+    /**
+     * setEnableDebug 接口调用参数类型
+     * @platform 基础库 2.4.0+（基本调试开关）、3.6.0+（广告模块调试），低版本需做兼容处理
+     */
+    interface SetEnableDebugOptions {
+        /** 是否打开调试（必填） */
+        enableDebug: boolean;
+        /** 模块调试配置列表（3.6.0+ 支持） */
+        debugModule?: DebugModule[];
+        /** 接口调用成功的回调函数 */
+        success?: () => void;
+        /** 接口调用失败的回调函数 */
+        fail?: (err?: any) => void;
+        /** 接口调用结束的回调函数（成功/失败都会执行） */
+        complete?: () => void;
+    }
+
+    /**
+     * 日志管理器实例（由 bl.getLogManager 获取）
+     * @platform 基础库 3.11.0+，低版本需做兼容处理
+     * @description 本地最多保存 5M 日志，超过则删除旧日志；可通过 bl.createFeedbackButton 上传日志
+     */
+    interface LogManager {
+        /**
+         * 写 debug 日志
+         * @param args 日志内容（可传任意多个），每次调用参数总大小不超过 100Kb
+         */
+        debug: (...args: any[]) => void;
+
+        /**
+         * 写 info 日志
+         * @param args 日志内容（可传任意多个），每次调用参数总大小不超过 100Kb
+         */
+        info: (...args: any[]) => void;
+
+        /**
+         * 写 log 日志
+         * @param args 日志内容（可传任意多个），每次调用参数总大小不超过 100Kb
+         */
+        log: (...args: any[]) => void;
+
+        /**
+         * 写 warn 日志
+         * @param args 日志内容（可传任意多个），每次调用参数总大小不超过 100Kb
+         */
+        warn: (...args: any[]) => void;
     }
     /**
      * onShow 回调中 referrerInfo 字段的结构类型
@@ -266,6 +473,50 @@ declare namespace BilibilWebMinigame {
         success?: (res: LaunchOptionsResult) => void;
         /** 接口调用失败的回调函数 */
         fail?: (err?: any) => void;
+    }
+    /**
+     * LoadSubpackageTask.onProgressUpdate 回调参数类型
+     * @description 分包加载进度变化事件的返回参数
+     */
+    interface LoadSubpackageProgressUpdateResult {
+        /** 分包下载进度百分比 */
+        progress: number;
+        /** 已经下载的数据长度，单位 Bytes */
+        totalBytesWritten: number;
+        /** 预期需要下载的数据总长度，单位 Bytes */
+        totalBytesExpectedToWrite: number;
+    }
+
+    /**
+     * loadSubpackage 接口调用参数类型
+     * @description 触发分包加载的配置项
+     */
+    interface LoadSubpackageOptions {
+        /**
+         * 分包的名字（必填）
+         * @description 可填写分包的 name 或 root 字段值
+         */
+        name: string;
+        /** 分包加载成功的回调函数（必填） */
+        success: () => void;
+        /** 分包加载失败的回调函数（必填） */
+        fail: (err?: any) => void;
+        /** 分包加载结束的回调函数（必填，成功/失败都会执行） */
+        complete: () => void;
+    }
+
+    /**
+     * 加载分包任务实例
+     * @description 用于获取分包加载状态，由 bl.loadSubpackage 接口返回
+     */
+    interface LoadSubpackageTask {
+        /**
+         * 监听分包加载进度变化事件
+         * @param callback 进度变化事件的回调函数，包含下载进度、已下载字节数、总字节数
+         */
+        onProgressUpdate: (
+            callback: (res: LoadSubpackageProgressUpdateResult) => void,
+        ) => void;
     }
     /**
      * 当前小程序运行的宿主环境信息
@@ -376,6 +627,37 @@ declare namespace BilibilWebMinigame {
         complete?: () => void;
     }
     /**
+     * 触控设备上的触摸点信息
+     * @description 通常指手指/触控笔在触屏设备/触摸板上的操作点
+     */
+    interface Touch {
+        /**
+         * Touch 对象的唯一标识符（只读）
+         * @description 一次触摸动作的整个过程中该标识符不变，可用于判断是否为同一次触摸
+         */
+        identifier: number;
+        /** 触点相对于页面左边沿的 X 坐标 */
+        pageX: number;
+        /** 触点相对于页面上边沿的 Y 坐标 */
+        pageY: number;
+        /** 触点相对于可见视区左边沿的 X 坐标 */
+        clientX: number;
+        /** 触点相对于可见视区上边沿的 Y 坐标 */
+        clientY: number;
+    }
+
+    /**
+     * 触摸事件回调参数类型（适用于所有 touch 系列事件）
+     */
+    interface TouchEventCallbackResult {
+        /** 当前所有触摸点的列表 */
+        touches: Touch[];
+        /** 触发此次事件的触摸点列表 */
+        changedTouches: Touch[];
+        /** 事件触发时的时间戳 */
+        timeStamp: number;
+    }
+    /**
      * onCheckForUpdate 回调参数类型
      * @platform 基础库 2.6.0+
      */
@@ -395,15 +677,6 @@ declare namespace BilibilWebMinigame {
         enable?: boolean;
         /** 调试模式，支持 'success'/'fail'，默认 'success' */
         mode?: "success" | "fail";
-    }
-
-    /**
-     * setEnableDebug 接口参数类型
-     * @platform 基础库 2.6.0+
-     */
-    interface SetEnableDebugOptions {
-        /** 调试模块配置列表 */
-        debugModule?: (UpdateDebugModule | Record<string, any>)[];
     }
 
     /**

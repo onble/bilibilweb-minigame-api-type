@@ -59,13 +59,6 @@ declare namespace BilibilWebMinigame {
          */
         getUpdateManager: () => UpdateManager;
 
-        /**
-         * 设置调试开关（含更新模块调试）
-         * @platform 基础库 2.6.0+
-         * @param options 调试配置项
-         */
-        setEnableDebug?: (options: SetEnableDebugOptions) => void;
-
         //#endregion 更新
 
         //#region 生命周期
@@ -160,6 +153,148 @@ declare namespace BilibilWebMinigame {
         onAudioInterruptionBegin: (callback: () => void) => void;
         //#endregion 应用级事件
 
+        //#region 触摸事件
+        /**
+         * 取消监听触点失效事件
+         * @param callback 要取消的、已绑定的触点失效事件回调函数
+         */
+        offTouchCancel: (callback: (res: TouchEventCallbackResult) => void) => void;
+
+        /**
+         * 监听触点失效事件
+         * @param callback 触点失效事件触发时的回调函数
+         */
+        onTouchCancel: (callback: (res: TouchEventCallbackResult) => void) => void;
+
+        /**
+         * 监听触摸结束事件
+         * @param callback 触摸结束事件触发时的回调函数
+         */
+        onTouchEnd: (callback: (res: TouchEventCallbackResult) => void) => void;
+
+        /**
+         * 取消监听触摸结束事件
+         * @param callback 要取消的、已绑定的触摸结束事件回调函数
+         */
+        offTouchEnd: (callback: (res: TouchEventCallbackResult) => void) => void;
+
+        /**
+         * 取消监听触点移动事件
+         * @param callback 要取消的、已绑定的触点移动事件回调函数
+         */
+        offTouchMove: (callback: (res: TouchEventCallbackResult) => void) => void;
+
+        /**
+         * 监听触点移动事件
+         * @param callback 触点移动事件触发时的回调函数
+         */
+        onTouchMove: (callback: (res: TouchEventCallbackResult) => void) => void;
+
+        /**
+         * 取消监听开始触摸事件
+         * @param callback 要取消的、已绑定的开始触摸事件回调函数
+         */
+        offTouchStart: (callback: (res: TouchEventCallbackResult) => void) => void;
+
+        /**
+         * 监听开始触摸事件
+         * @param callback 开始触摸事件触发时的回调函数
+         */
+        onTouchStart: (callback: (res: TouchEventCallbackResult) => void) => void;
+        //#endregion 触摸事件
+
+        //#region 性能
+        /**
+         * 加快触发 JavaScript 引擎垃圾回收（GC）
+         * @platform 基础库 3.12.0+，低版本需做兼容处理
+         * @description GC 时机由 JavaScript 引擎控制，调用后不保证马上触发 GC
+         */
+        triggerGC: () => void;
+        //#endregion 性能
+
+        //#region 分包加载
+        /**
+         * 触发分包加载
+         * @description 详细规则参考「分包加载」文档
+         * @param options 分包加载配置项（所有核心回调均为必填）
+         * @returns 加载分包任务实例，可用于监听加载进度
+         */
+        loadSubpackage: (
+            options: LoadSubpackageOptions
+        ) => LoadSubpackageTask;
+        //#endregion 分包加载
+
+        //#region 定时器
+        /**
+          * 设定一个一次性定时器，定时到期后执行回调函数
+          * @param callback 定时到期后要执行的回调函数
+          * @param delay 延迟时间，单位为毫秒（ms），回调函数会在该延迟后执行
+          * @returns 定时器编号，可传递给 clearTimeout 取消该定时器
+          */
+        setTimeout: (callback: () => void, delay: number) => number;
+
+        /**
+         * 取消由 setTimeout 设置的一次性定时器
+         * @param timeoutID 要取消的定时器编号（由 setTimeout 返回）
+         */
+        clearTimeout: (timeoutID: number) => void;
+
+        /**
+         * 设定一个周期性定时器，按指定周期执行回调函数
+         * @param callback 每个周期要执行的回调函数
+         * @param delay 执行回调函数的时间间隔，单位为毫秒（ms）
+         * @returns 定时器编号，可传递给 clearInterval 取消该定时器
+         */
+        setInterval: (callback: () => void, delay: number) => number;
+
+        /**
+         * 取消由 setInterval 设置的周期性定时器
+         * @param intervalID 要取消的定时器编号（由 setInterval 返回）
+         */
+        clearInterval: (intervalID: number) => void;
+
+        //#endregion 定时器
+
+        //#region 调试
+        /**
+         * 设置是否打开调试开关（对正式版也生效）
+         * @platform 基础库 2.4.0+（基本调试开关）、3.6.0+（广告模块调试），低版本需做兼容处理
+         * @param options 调试开关配置项
+         * @example
+         * // 打开调试
+         * bl.setEnableDebug({
+         *     enableDebug: true,
+         * });
+         * 
+         * // 关闭调试
+         * bl.setEnableDebug({
+         *     enableDebug: false,
+         * });
+         * 
+         * // 更新模块调试
+         * bl.setEnableDebug({
+         *     debugModule: [{
+         *         name: 'update',
+         *         enable: true, // 是否开启更新调试, 默认 false
+         *         mode: 'success'// 调试模式，支持 'success'、'fail', 默认 'success'
+         *     }]
+         * });
+         */
+        setEnableDebug: (options: SetEnableDebugOptions) => void;
+
+        /**
+         * 获取日志管理器对象
+         * @platform 基础库 3.11.0+，低版本需做兼容处理
+         * @returns 日志管理器实例
+         * @example
+         * const logger = bl.getLogManager()
+         * logger.log({str: 'hello world'}, 'basic log', 100, [1, 2, 3])
+         * logger.info({str: 'hello world'}, 'info log', 100, [1, 2, 3])
+         * logger.debug({str: 'hello world'}, 'debug log', 100, [1, 2, 3])
+         * logger.warn({str: 'hello world'}, 'warn log', 100, [1, 2, 3])
+         */
+        getLogManager: () => LogManager;
+        //#endregion 调试
         //#endregion 基础
     }
 }

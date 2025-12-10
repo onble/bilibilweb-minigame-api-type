@@ -22,15 +22,6 @@ declare namespace BilibilWebMinigame {
     }
 
     /**
-     * setEnableDebug 接口参数类型
-     * @platform 基础库 2.6.0+
-     */
-    interface SetEnableDebugOptions {
-        /** 调试模块配置列表 */
-        debugModule?: (UpdateDebugModule | Record<string, any>)[];
-    }
-
-    /**
      * 更新管理器对象（全局唯一）
      * @platform 基础库 2.6.0+，低版本需做兼容处理
      * @description 用于管理小游戏更新，通过 bl.getUpdateManager() 获取实例
