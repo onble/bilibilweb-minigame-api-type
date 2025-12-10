@@ -308,6 +308,46 @@ declare namespace BilibilWebMinigame {
          */
         createCanvas: () => Canvas;
         //#endregion 画布
+
+        //#region 帧率
+
+        /**
+         * 修改小游戏渲染帧率
+         * @platform 基础库 2.4.0+，低版本需做兼容处理
+         * @description 默认渲染帧率为 60 帧/秒；修改后 requestAnimationFrame 的回调频率会同步改变
+         * @param fps 目标帧率，有效范围 1 ~ 60
+         */
+        setPreferredFramesPerSecond: (fps: number) => void;
+
+        //#endregion 帧率
+
+
+        //#region 字体
+
+        /**
+         * 加载自定义字体文件
+         * @param path 字体文件路径（支持代码包路径、blfile:// 协议的本地文件路径）
+         * @returns 加载成功返回字体 family 值，加载失败返回 null
+         */
+        loadFont: (path: string) => string | null;
+
+        /**
+         * 获取一行文本的行高
+         * @param options 文本样式、内容及回调配置项
+         * @returns 文本的行高数值
+         */
+        getTextLineHeight: (options: GetTextLineHeightOptions) => number;
+
+        //#endregion 字体
+
+        //#region 图片
+        /**
+         * 创建一个图片对象
+         * @returns 图片对象实例，可通过 src 设置图片地址，监听 onload/onerror 处理加载状态
+         */
+        createImage: () => Image;
+        //#endregion 图片
+
         //#endregion 渲染
     }
 }
