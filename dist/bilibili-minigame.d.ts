@@ -67,7 +67,205 @@ declare namespace BilibilWebMinigame {
 
         //#endregion 更新
 
+        //#region 生命周期
+        /**
+         * 取消监听小游戏回到前台的事件
+         * @param callback 要取消的、已绑定的小游戏前台事件回调函数
+         */
+        offShow: (callback: (res: OnShowCallbackResult) => void) => void;
+
+        /**
+         * 监听小游戏回到前台的事件
+         * @param callback 小游戏回到前台时触发的回调函数
+         */
+        onShow: (callback: (res: OnShowCallbackResult) => void) => void;
+
+        /**
+         * 取消监听小游戏隐藏到后台的事件
+         * @param callback 要取消的、已绑定的小游戏后台事件回调函数
+         */
+        offHide: (callback: () => void) => void;
+
+        /**
+         * 监听小游戏隐藏到后台的事件
+         * @description 锁屏、按 HOME 键退到桌面等操作会触发此事件
+         * @param callback 小游戏隐藏到后台时触发的回调函数
+         */
+        onHide: (callback: () => void) => void;
+        /**
+         * 退出当前小游戏
+         * @param object 接口调用配置项，包含成功/失败/完成回调
+         */
+        exitMiniProgram: (object: ExitMiniProgramOptions) => void;
+
+        /**
+         * 获取本次小游戏启动时的参数（异步版本）
+         * @description 冷启动返回值与回调参数一致；热启动返回值与 App.onShow 一致
+         * @param options 接口调用配置项，包含成功/失败回调
+         */
+        getLaunchOptions: (options: GetLaunchOptionsOptions) => void;
+
+        /**
+         * 获取本次小游戏启动时的参数（同步版本）
+         * @description 冷启动返回值与自身返回值一致；热启动返回值与 App.onShow 一致
+         * @returns 启动参数信息
+         */
+        getLaunchOptionsSync: () => LaunchOptionsResult;
+
+        /**
+         * 获取小游戏打开的参数（包括冷启动和热启动）
+         * @returns 启动参数信息
+         */
+        getEnterOptionsSync: () => LaunchOptionsResult;
+        //#endregion 生命周期
+
+        //#region 应用级事件
+        /**
+         * 取消监听全局错误事件
+         * @param callback 要取消的、已绑定的全局错误事件回调函数
+         */
+        offError: (callback: (res: OnErrorCallbackResult) => void) => void;
+
+        /**
+         * 监听全局错误事件
+         * @param callback 全局错误事件触发时的回调函数，包含错误信息和调用堆栈
+         */
+        onError: (callback: (res: OnErrorCallbackResult) => void) => void;
+
+        /**
+         * 取消监听音频中断结束事件
+         * @param callback 要取消的、已绑定的音频中断结束事件回调函数
+         */
+        offAudioInterruptionEnd: (callback: () => void) => void;
+
+        /**
+         * 监听音频中断结束事件
+         * @description 在收到 onAudioInterruptionBegin 事件后，小游戏内所有音频会暂停；收到此事件后才可再次播放成功
+         * @param callback 音频中断结束事件触发时的回调函数
+         */
+        onAudioInterruptionEnd: (callback: () => void) => void;
+
+        /**
+         * 取消监听音频因系统占用被中断开始事件
+         * @param callback 要取消的、已绑定的音频中断开始事件回调函数
+         */
+        offAudioInterruptionBegin: (callback: () => void) => void;
+
+        /**
+         * 监听音频因系统占用被中断开始事件
+         * @description 闹钟、电话、FaceTime 通话等场景会触发此事件；触发后小游戏内所有音频会暂停
+         * @param callback 音频中断开始事件触发时的回调函数
+         */
+        onAudioInterruptionBegin: (callback: () => void) => void;
+        //#endregion 应用级事件
+
         //#endregion 基础
+    }
+    /**
+     * onError 全局错误事件回调参数类型
+     */
+    interface OnErrorCallbackResult {
+        /** 错误信息描述 */
+        message: string;
+        /** 错误调用堆栈信息 */
+        stack: string;
+    }
+    /**
+     * onShow 回调中 referrerInfo 字段的结构类型
+     * @description 仅当场景为由从另一个小游戏打开时返回此字段
+     */
+    interface ReferrerInfo {
+        /** 来源小游戏的 appId */
+        appId: string;
+        /** 来源小游戏的 vAppId */
+        vAppId: string;
+        /** 来源小游戏传过来的数据 */
+        extraData: Record<string, any>;
+    }
+
+    /**
+     * onShow 回调参数类型
+     */
+    interface OnShowCallbackResult {
+        /** 启动小游戏的查询参数 */
+        query: Record<string, any>;
+        /** 来源小游戏信息（仅跨小游戏打开时存在） */
+        referrerInfo?: ReferrerInfo;
+        /**
+         * 启动小游戏的场景值
+         * @description 合法值见「场景值介绍」文档，可在 bl.getLaunchOptionsSync 和 bl.onShow 中获取
+         * 示例值：10001（我的-小游戏中心）、10002（桌面快捷入口）、10003（分享渠道）、021036（侧边栏）
+         */
+        scene: string;
+    }
+
+    /**
+     * exitMiniProgram 接口调用参数类型
+     * @description 用于配置退出小游戏接口的回调函数
+     */
+    interface ExitMiniProgramOptions {
+        /** 接口调用成功的回调函数 */
+        success?: () => void;
+        /** 接口调用失败的回调函数 */
+        fail?: (err?: any) => void;
+        /** 接口调用结束的回调函数（成功/失败都会执行） */
+        complete?: () => void;
+    }
+
+    /**
+     * 小游戏运行环境枚举（envVersion 合法值）
+     */
+    type EnvVersion = "" | "dev" | "predev" | "precheck";
+
+    /**
+     * 启动参数中的来源信息结构（referrerInfo）
+     */
+    interface LaunchOptionsReferrerInfo {
+        /** 来源小程序/小游戏的 appId */
+        appId: string;
+        /**
+         * 来源小程序的虚拟ID
+         * @description 仅小程序类型返回该字段，可关联Up主信息，对应指定Up主
+         */
+        vappId?: string;
+        /** 来源小程序传过来的数据 */
+        extraData: Record<string, any>;
+    }
+
+    /**
+     * getLaunchOptions/getLaunchOptionsSync/getEnterOptionsSync 返回/回调的核心参数类型
+     */
+    interface LaunchOptionsResult {
+        /** 启动小游戏的 query 参数 */
+        query: Record<string, any>;
+        /**
+         * 小游戏所在环境
+         * @description 空值表示线上环境；dev=开发调试版、predev=开发预览版、precheck=审核预览版
+         */
+        envVersion: EnvVersion;
+        /**
+         * 来源信息
+         * @description 从另一个小程序/小游戏进入时返回，否则返回空对象
+         */
+        referrerInfo: LaunchOptionsReferrerInfo | Record<string, never>;
+        /**
+         * 启动小游戏的场景值
+         * @description 合法值见「场景值介绍」文档
+         */
+        scene: string;
+    }
+
+    /**
+     * getLaunchOptions 接口调用参数类型
+     */
+    interface GetLaunchOptionsOptions {
+        /**
+         * 接口调用成功的回调函数
+         * @param res 启动参数信息
+         */
+        success?: (res: LaunchOptionsResult) => void;
+        /** 接口调用失败的回调函数 */
+        fail?: (err?: any) => void;
     }
     /**
      * 当前小程序运行的宿主环境信息

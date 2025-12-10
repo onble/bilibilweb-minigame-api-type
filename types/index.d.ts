@@ -120,6 +120,46 @@ declare namespace BilibilWebMinigame {
         getEnterOptionsSync: () => LaunchOptionsResult;
         //#endregion 生命周期
 
+        //#region 应用级事件
+        /**
+         * 取消监听全局错误事件
+         * @param callback 要取消的、已绑定的全局错误事件回调函数
+         */
+        offError: (callback: (res: OnErrorCallbackResult) => void) => void;
+
+        /**
+         * 监听全局错误事件
+         * @param callback 全局错误事件触发时的回调函数，包含错误信息和调用堆栈
+         */
+        onError: (callback: (res: OnErrorCallbackResult) => void) => void;
+
+        /**
+         * 取消监听音频中断结束事件
+         * @param callback 要取消的、已绑定的音频中断结束事件回调函数
+         */
+        offAudioInterruptionEnd: (callback: () => void) => void;
+
+        /**
+         * 监听音频中断结束事件
+         * @description 在收到 onAudioInterruptionBegin 事件后，小游戏内所有音频会暂停；收到此事件后才可再次播放成功
+         * @param callback 音频中断结束事件触发时的回调函数
+         */
+        onAudioInterruptionEnd: (callback: () => void) => void;
+
+        /**
+         * 取消监听音频因系统占用被中断开始事件
+         * @param callback 要取消的、已绑定的音频中断开始事件回调函数
+         */
+        offAudioInterruptionBegin: (callback: () => void) => void;
+
+        /**
+         * 监听音频因系统占用被中断开始事件
+         * @description 闹钟、电话、FaceTime 通话等场景会触发此事件；触发后小游戏内所有音频会暂停
+         * @param callback 音频中断开始事件触发时的回调函数
+         */
+        onAudioInterruptionBegin: (callback: () => void) => void;
+        //#endregion 应用级事件
+
         //#endregion 基础
     }
 }

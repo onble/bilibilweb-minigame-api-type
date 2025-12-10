@@ -1,0 +1,5 @@
+{
+    "watch": ["types"],
+    "ext": "d.ts",
+    "exec": "npm run build:dts"
+}

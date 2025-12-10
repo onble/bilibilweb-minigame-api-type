@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch:dts": "nodemon",
+    "build:dts": "gulp build-types"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +16,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-insert": "^0.5.0",
     "gulp-prettier": "^6.0.0",
+    "nodemon": "^3.1.11",
     "prettier": "^3.7.4"
   }
 }
