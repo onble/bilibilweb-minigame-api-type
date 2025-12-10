@@ -349,5 +349,117 @@ declare namespace BilibilWebMinigame {
         //#endregion 图片
 
         //#endregion 渲染
+
+        //#region 界面
+
+        //#region 交互
+
+        /**
+         * 显示消息提示框
+         * @description 需与 bl.hideToast 配对使用；可与 bl.showLoading 同时显示
+         * @param options 提示框配置项
+         * @example
+         * bl.showToast({
+         *   title: '成功',
+         *   icon: 'success',
+         *   duration: 2000
+         * })
+         */
+        showToast: (options: ShowToastOptions) => void;
+
+        /**
+         * 隐藏消息提示框
+         * @param options 回调配置项
+         */
+        hideToast: (options?: HideToastLoadingOptions) => void;
+
+        /**
+         * 显示加载提示框（需主动调用 hideLoading 关闭）
+         * @description 需与 bl.hideLoading 配对使用；与 bl.showToast 同时只能显示一个
+         * @param options 加载提示框配置项
+         * @example
+         * bl.showLoading({
+         *   title: '加载中',
+         * })
+         * setTimeout(function () {
+         *   bl.hideLoading()
+         * }, 2000)
+         */
+        showLoading: (options: ShowLoadingOptions) => void;
+
+        /**
+         * 隐藏加载提示框
+         * @param options 回调配置项
+         */
+        hideLoading: (options?: HideToastLoadingOptions) => void;
+
+        /**
+         * 显示模态对话框
+         * @param options 对话框配置项
+         * @example
+         * bl.showModal({
+         *   title: '提示',
+         *   content: '这是一个模态弹窗',
+         *   success(res) {
+         *     if (res.confirm) {
+         *       console.log('用户点击确定')
+         *     } else if (res.cancel) {
+         *       console.log('用户点击取消')
+         *     }
+         *   }
+         * })
+         */
+        showModal: (options: ShowModalOptions) => void;
+
+        /**
+         * 显示操作菜单
+         * @param options 操作菜单配置项
+         * @example
+         * bl.showActionSheet({
+         *   itemList: ['A', 'B', 'C'],
+         *   success(res) {
+         *     console.log(res.tapIndex)
+         *   },
+         *   fail(res) {
+         *     console.log(res.errMsg)
+         *   }
+         * })
+         */
+        showActionSheet: (options: ShowActionSheetOptions) => void;
+
+        /**
+         * 创建添加到桌面的引导按钮（单例对象）
+         * @platform 基础库 3.8.0+，iOS 暂不支持
+         * @param options 引导组件配置项
+         * @example 一直展示
+         * ⽤户点击引导组件旁边的关闭按钮才能关闭，点击添加按钮可直接添加到我的桌⾯。
+         * bl.showAddToDesktopGuide({
+         *  type: 'bar',
+         *  content: '⼀键添加到我的桌⾯',
+         *  success: res => {
+         *  console.log('添加成功：', res);
+         *  },
+         *  fail: err => {
+         *  console.log('添加失败：', err);
+         *  }
+         * })
+         * @example ⾃动消失
+         * 引导组件 3s 后⾃动消失，点击添加按钮可直接添加到我的桌⾯。
+         * bl.showAddToDesktopGuide({
+         *  type: 'bar-autohide',
+         *  content: '⼀键添加到我的桌⾯',
+         *  success: res => {
+         *  console.log('添加成功：', res);
+         *  },
+         *  fail: err => {
+         *  console.log('添加失败：', err);
+         *  }
+         * })
+         */
+        showAddToDesktopGuide: (options: ShowAddToDesktopGuideOptions) => void;
+
+        //#endregion 交互
+
+        //#endregion 界面
     }
 }
