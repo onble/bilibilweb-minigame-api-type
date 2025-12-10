@@ -294,7 +294,20 @@ declare namespace BilibilWebMinigame {
          * logger.warn({str: 'hello world'}, 'warn log', 100, [1, 2, 3])
          */
         getLogManager: () => LogManager;
+
         //#endregion 调试
+
         //#endregion 基础
+
+        //#region 渲染
+        //#region 画布
+        /**
+         * 创建画布对象
+         * @description 首次调用创建屏幕画布，后续调用创建离屏画布
+         * @returns 画布对象
+         */
+        createCanvas: () => Canvas;
+        //#endregion 画布
+        //#endregion 渲染
     }
 }
