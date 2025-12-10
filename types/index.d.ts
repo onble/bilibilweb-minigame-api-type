@@ -460,6 +460,118 @@ declare namespace BilibilWebMinigame {
 
         //#endregion 交互
 
+        //#region 键盘
+
+        /**
+         * 取消监听键盘收起事件
+         * @param callback 要取消的键盘收起事件回调函数
+         */
+        offKeyboardComplete: (
+            callback: (res: KeyboardCompleteConfirmResult) => void
+        ) => void;
+
+        /**
+         * 监听键盘收起事件
+         * @param callback 键盘收起时触发的回调函数，返回当前输入值
+         */
+        onKeyboardComplete: (
+            callback: (res: KeyboardCompleteConfirmResult) => void
+        ) => void;
+
+        /**
+         * 取消监听用户点击键盘 Confirm 按钮的事件
+         * @param callback 要取消的 Confirm 按钮事件回调函数
+         */
+        offKeyboardConfirm: (
+            callback: (res: KeyboardCompleteConfirmResult) => void
+        ) => void;
+
+        /**
+         * 监听用户点击键盘 Confirm 按钮的事件
+         * @param callback 点击 Confirm 按钮时触发的回调函数，返回当前输入值
+         */
+        onKeyboardConfirm: (
+            callback: (res: KeyboardCompleteConfirmResult) => void
+        ) => void;
+
+        /**
+         * 取消监听键盘输入事件
+         * @param callback 要取消的键盘输入事件回调函数
+         */
+        offKeyboardInput: (callback: (res: KeyboardInputResult) => void) => void;
+
+        /**
+         * 监听键盘输入事件
+         * @param callback 键盘输入时触发的回调函数，返回当前输入值（文档标注为 Object 类型）
+         */
+        onKeyboardInput: (callback: (res: KeyboardInputResult) => void) => void;
+
+        /**
+         * 更新键盘输入框内容
+         * @description 仅当键盘处于拉起状态时调用才会产生效果
+         * @param options 输入框内容及回调配置项
+         */
+        updateKeyboard: (options: UpdateKeyboardOptions) => void;
+
+        /**
+         * 隐藏键盘
+         * @description Android 端点击收起键盘按钮不会自动隐藏输入框，需主动调用此方法
+         * @param options 回调配置项
+         */
+        hideKeyboard: (options?: HideKeyboardOptions) => void;
+
+        /**
+         * 显示键盘
+         * @param options 键盘显示配置项（所有核心参数均为必填）
+         */
+        showKeyboard: (options: ShowKeyboardOptions) => void;
+
+        //#endregion 键盘
+
+        //#region 菜单
+
+        /**
+         * 动态设置右上角按钮拉起的菜单样式
+         * @param options 菜单样式及回调配置项
+         */
+        setMenuStyle: (options: SetMenuStyleOptions) => void;
+
+        /**
+         * 获取菜单按钮（右上角胶囊按钮）的布局位置信息
+         * @platform 基础库 2.4.0+，低版本需做兼容处理
+         * @description 坐标信息以屏幕左上角为原点
+         * @returns 菜单按钮的布局位置信息（含宽高、上下左右边界坐标）
+         */
+        getMenuButtonBoundingClientRect: () => MenuButtonBoundingClientRect;
+
+        //#endregion 菜单
+
+        //#region 状态栏
+
+        /**
+         * 修改状态栏的样式
+         * @param options 状态栏样式及回调配置项
+         */
+        setStatusBarStyle: (options: SetStatusBarStyleOptions) => void;
+
+        //#endregion 状态栏
+
+        //#region 窗口
+
+        /**
+         * 取消监听窗口尺寸变化事件
+         * @param callback 要取消的、已绑定的窗口尺寸变化事件回调函数
+         */
+        offWindowResize: (callback: (res: WindowResizeCallbackResult) => void) => void;
+
+        /**
+         * 监听窗口尺寸变化事件
+         * @param callback 窗口尺寸变化时触发的回调函数，返回变化后的窗口宽高（单位 px）
+         */
+        onWindowResize: (callback: (res: WindowResizeCallbackResult) => void) => void;
+
+        //#endregion 窗口
+
         //#endregion 界面
     }
 }
