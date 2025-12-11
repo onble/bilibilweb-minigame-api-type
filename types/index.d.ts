@@ -943,7 +943,117 @@ declare namespace BilibilWebMinigame {
          * }
          */
         getStorageSync: (key: string) => any;
-    }
 
-    //#endregion 数据缓存
+        //#endregion 数据缓存
+
+        //#region 媒体
+
+        //#region 音频
+
+        /**
+         * 创建内部 audio 上下文 InnerAudioContext 对象
+         * @returns 内部音频上下文实例
+         */
+        createInnerAudioContext: () => InnerAudioContext;
+
+        /**
+         * 设置 InnerAudioContext 的播放选项（对当前小游戏全局生效）
+         * @param options 音频播放选项配置及回调项
+         */
+        setInnerAudioOption: (options?: SetInnerAudioOptionOptions) => void;
+        //#endregion 音频
+
+        //#region 图片
+
+        /**
+         * 保存图片到系统相册
+         * @param options 保存图片的配置项（必填 filePath）
+         * @example
+         * bl.saveImageToPhotosAlbum({
+         *   success(res) { }
+         * })
+         */
+        saveImageToPhotosAlbum: (options: SaveImageToPhotosAlbumOptions) => void;
+
+        //#endregion 图片
+
+        //#region 视频
+        /**
+         * 保存视频到系统相册
+         * @platform 基础库 ≥3.62.0 支持
+         * @description 仅支持 mp4 格式；文件路径仅支持 blfile 协议/包内本地路径
+         * @param options 保存视频配置项（必填 filePath）
+         * @example
+         * bl.saveVideoToPhotosAlbum({
+         *   filePath: 'blfile://xxx',
+         *   success (res) {
+         *     console.log(res.errMsg)
+         *   }
+         * })
+         */
+        saveVideoToPhotosAlbum: (options: SaveVideoToPhotosAlbumOptions) => void;
+
+        /**
+         * 创建视频对象
+         * @platform 基础库 3.12.0+，低版本需做兼容处理
+         * @param options 视频配置项（必填 src）
+         * @returns 视频对象（可控制播放/暂停/全屏等）
+         */
+        createVideo: (options: CreateVideoOptions) => Video;
+        //#endregion 视频
+
+        //#region 相机
+
+        /**
+        * 创建相机对象
+        * @platform 基础库 3.79.0+，低版本需做兼容处理
+        * @description 使用前需先通过 bl.authorize 获取 scope.camera 授权
+        * @param options 相机配置项
+        * @returns 相机对象（可控制录像/拍照/帧监听等）
+        * @example
+        * let camera
+         * // 获取用户的当前设置
+         * bl.getSetting({
+         *   success(res) {
+         *     if (!res.authSetting['scope.camera']) {
+         *       // 发起授权请求
+         *       bl.authorize({
+         *         scope: 'scope.camera',
+         *         success() {
+         *           // 创建camera对象
+         *           camera = bl.createCamera({
+         *             x: 0,
+         *             y: 0,
+         *             width: 300,
+         *             height: 350,
+         *             devicePosition: 'back',
+         *             flash: 'on',
+         *             size: 'small',
+         *             success: (res)=> {
+         *                 console.log('createCameraSuccess', res)
+         *             },
+         *             fail: (res)=> {
+         *                 console.log('createCameraFail', res)
+         *             },
+         *             complete: (res) => {
+         *                 console.log('createCameraComplete', res)
+         *             }
+         *           })
+         *         }
+         *       })
+         *     } else {
+         *       camera = bl.createCamera({
+         *         // ...
+         *       })
+         *     }
+         *   }
+         * })
+        */
+        createCamera: (options?: CreateCameraOptions) => Camera;
+
+        //#endregion 相机
+
+        //#endregion 媒体
+
+    }
 }
