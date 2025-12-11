@@ -806,5 +806,144 @@ declare namespace BilibilWebMinigame {
         shareAppMessage: (options?: ShareAppMessageOptions) => void;
 
         //#endregion 转发
+
+        //#region 数据缓存
+
+        /**
+         * 异步获取当前 storage 的相关信息
+         * @param options 回调配置项
+         * @example
+         * bl.getStorageInfo({
+         *   success(res) {
+         *     console.log(res.keys)
+         *     console.log(res.currentSize)
+         *     console.log(res.limitSize)
+         *   }
+         * })
+         */
+        getStorageInfo: (options?: GetStorageInfoOptions) => void;
+
+        /**
+         * 同步获取当前 storage 的相关信息
+         * @description 同步接口可能抛出异常，需 try/catch 捕获
+         * @returns 本地缓存信息（key列表、已用空间、空间上限）
+         * @example
+         * try {
+         *   const res = bl.getStorageInfoSync()
+         *   console.log(res.keys)
+         *   console.log(res.currentSize)
+         *   console.log(res.limitSize)
+         * } catch (e) {
+         *   // Do something when catch error
+         * }
+         */
+        getStorageInfoSync: () => StorageInfoResult;
+
+        /**
+         * 异步清理本地数据缓存
+         * @param options 回调配置项
+         * @example
+         * bl.clearStorage()
+         */
+        clearStorage: (options?: ClearStorageOptions) => void;
+
+        /**
+         * 同步清理本地数据缓存
+         * @description 同步接口可能抛出异常，需 try/catch 捕获
+         * @example
+         * try {
+         *   bl.clearStorageSync()
+         * } catch (e) {
+         *   // Do something when catch error
+         * }
+         */
+        clearStorageSync: () => void;
+
+        /**
+         * 异步从本地缓存中移除指定 key
+         * @param options 移除配置项（含必填 key）
+         * @example
+         * bl.removeStorage({
+         *   key: 'key',
+         *   success(res) {
+         *     console.log(res.data)
+         *   }
+         * })
+         */
+        removeStorage: (options: RemoveStorageOptions) => void;
+
+        /**
+         * 同步从本地缓存中移除指定 key
+         * @description 同步接口可能抛出异常，需 try/catch 捕获
+         * @param key 本地缓存中指定的 key
+         * @example
+         * try {
+         *   bl.removeStorageSync('key')
+         * } catch (e) {
+         *   // Do something when catch error
+         * }
+         */
+        removeStorageSync: (key: string) => void;
+
+        /**
+         * 异步将数据存储到本地缓存的指定 key 中（会覆盖原有内容）
+         * @description 单个 key 最大存储 1MB，所有数据总上限 10MB；数据生命周期与小游戏一致
+         * @param options 存储配置项（含必填 key 和 data）
+         * @example
+         * bl.setStorage({
+         *   key: 'key',
+         *   data: 'value'
+         * })
+         */
+        setStorage: (options: SetStorageOptions) => void;
+
+        /**
+         * 同步将数据存储到本地缓存的指定 key 中（会覆盖原有内容）
+         * @description 单个 key 最大存储 1MB，所有数据总上限 10MB；同步接口可能抛出异常，需 try/catch 捕获
+         * @param key 本地缓存中指定的 key
+         * @param data 需要存储的内容（仅支持原生类型、Date、可 JSON 序列化对象）
+         * @example
+         * try {
+         *   const value = bl.getStorageSync('key')
+         *   if (value) {
+         *     // Do something with return value
+         *   }
+         * } catch (e) {
+         *   // Do something when catch error
+         * }
+         */
+        setStorageSync: (key: string, data: any) => void;
+
+        /**
+         * 异步从本地缓存中获取指定 key 的内容
+         * @param options 获取配置项（含必填 key）
+         * @example
+         * bl.getStorage({
+         *   key: 'key',
+         *   success(res) {
+         *     console.log(res.data)
+         *   }
+         * })
+         */
+        getStorage: (options: GetStorageOptions) => void;
+
+        /**
+         * 同步从本地缓存中获取指定 key 的内容
+         * @description 同步接口可能抛出异常，需 try/catch 捕获
+         * @param key 本地缓存中指定的 key
+         * @returns key 对应的内容
+         * @example
+         * try {
+         *   const value = bl.getStorageSync('key')
+         *   if (value) {
+         *     // Do something with return value
+         *   }
+         * } catch (e) {
+         *   // Do something when catch error
+         * }
+         */
+        getStorageSync: (key: string) => any;
     }
+
+    //#endregion 数据缓存
 }
