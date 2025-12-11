@@ -589,6 +589,178 @@ declare namespace BilibilWebMinigame {
         //#endregion 窗口
 
         //#endregion 界面
+
+        //#region 数据分析
+
+        /**
+         * 上报小游戏启动成功埋点
+         * @description 必须在游戏首页成功渲染时调用
+         */
+        launchSuccess: () => void;
+
+        /**
+         * 上报游戏启动阶段的自定义场景埋点
+         * @platform 基础库 3.99.9+，低版本需做兼容处理
+         * @param options 场景埋点配置项（含场景ID、耗时、自定义维度/指标）
+         * @example
+         * bl.reportScene({
+         *   sceneId: 7,
+         *   costTime: 350,
+         *   dimension: {
+         *     d1: '2.1.0', // value仅支持传入String类型。若value表示Boolean，请将值处理为'0'、'1'进行上报；若value为Number，请转换为String进行上报
+         *   },
+         *   metric: {
+         *     m1: '546', // value仅支持传入数值且需要转换为String类型进行上报
+         *   },
+         *   success (res) {
+         *     // 上报接口执行完成后的回调，用于检查上报数据是否符合预期
+         *     console.log(res)
+         *   },
+         *   fail (res) {
+         *     // 上报报错时的回调，用于查看上报错误的原因：如参数类型错误等
+         *     console.log(res)
+         *   }
+         * })
+         */
+        reportScene: (options: ReportSceneOptions) => void;
+
+        //#endregion 数据分析
+
+        //#region 网络
+
+        //#region 发起请求
+        /**
+         * 发起 HTTPS 网络请求
+         * @description 所有版本支持 request 种 cookie（下次同域名请求带入）；基础库 3.9.0+ 支持请求 *bilibili.com 域名接口时带上 app 登录信息
+         * @param options 网络请求配置项
+         * @returns 请求任务对象（基础库 1.4.0+ 支持）
+         * @example
+         * bl.request({
+         *     url: 'test.php', // 仅为示例，并非真实的接口地址
+         *     data: {
+         *         x: '',
+         *         y: '',
+         *     },
+         *     header: {
+         *         'content-type': 'application/json', // 默认值
+         *     },
+         *     success(res) {
+         *         console.log(res.data);
+         *     },
+         * });
+         */
+        request: (options: RequestOptions) => RequestTask;
+        //#endregion 发起请求
+
+        //#region 下载
+
+        /**
+         * 下载文件资源到本地（客户端发起 HTTPS GET 请求）
+         * @description 服务端需在响应 header 中指定合理的 Content-Type 以保证客户端正确处理文件类型
+         * @param options 文件下载配置项
+         * @returns 下载任务对象（基础库 2.3.0+ 支持）
+         * @example
+         * bl.downloadFile({
+         *     url: 'https://example.com/audio/123', // 仅为示例，并非真实的资源
+         *     success(res) {
+         *         // 只要服务器有响应数据，就会把响应内容写入文件并进入 success 回调，业务需要自行判断是否下载到了想要的内容
+         *         if (res.statusCode === 200) {
+         *             console.log(res.tempFilePath);
+         *         }
+         *     },
+         * });
+         */
+        downloadFile: (options: DownloadFileOptions) => DownloadTask;
+
+        //#endregion 下载
+
+        //#region 上传
+
+        /**
+         * 上传本地资源到服务器（客户端发起 HTTPS POST 请求，content-type 为 multipart/form-data）
+         * @platform 基础库 2.6.0+，低版本需做兼容处理
+         * @description 目前仅支持图片资源上传；header 中不能设置 Referer
+         * @param options 文件上传配置项
+         * @returns 上传任务对象（基础库 2.6.0+ 支持）
+         * @example
+         * const tempFilePath = 'blfile://temp/example.jpg';
+         * bl.uploadFile({
+         *     url: 'https://example.bilibili.com/upload', // 仅为示例，非真实的接口地址
+         *     filePath: tempFilePath,
+         *     name: 'file',
+         *     formData: {
+         *         user: 'test',
+         *     },
+         *     success(res) {
+         *         const data = res.data;
+         *         // do something
+         *     },
+         * });
+         */
+        uploadFile: (options: UploadFileOptions) => UploadTask;
+
+        //#endregion 上传
+
+        //#region WebSocket
+
+        /**
+         * 创建 WebSocket 连接（仅支持 wss 协议）
+         * @param options WebSocket 连接配置项
+         * @returns WebSocket 任务对象
+         */
+        connectSocket: (options: ConnectSocketOptions) => SocketTask;
+
+        //#endregion WebSocket
+
+        //#endregion 网络
+    }
+    /**
+     * reportScene 接口成功回调参数类型
+     */
+    interface ReportSceneSuccessResult {
+        /** 开发者上报的原始数据 */
+        data: Record<string, any>;
+    }
+
+    /**
+     * reportScene 接口失败回调参数类型
+     */
+    interface ReportSceneFailResult {
+        /** 开发者上报的原始数据 */
+        data: Record<string, any>;
+        /** 错误信息（含参数类型/长度等错误描述） */
+        errMsg: string;
+    }
+
+    /**
+     * reportScene 接口调用参数类型
+     * @platform 基础库 3.99.9+，低版本需做兼容处理
+     * @description 用于游戏启动阶段的自定义场景上报；dimension/metric 仅支持 JSON.stringify 序列化且序列化后长度≤1024字符
+     */
+    interface ReportSceneOptions {
+        /**
+         * 场景ID（必填）
+         * @description 预留值：7=游戏可玩（如进入游戏大厅）、10=游戏新手教程完成、1007=激励视频广告（用户点击看广告）
+         */
+        sceneId: number;
+        /** 此场景的耗时（单位：ms），默认 0，值需≥0 */
+        costTime?: number;
+        /**
+         * 自定义维度数据
+         * @description value 仅支持非空字符串：布尔值请转为 '0'/'1'，数字请转为字符串
+         */
+        dimension?: Record<string, string>;
+        /**
+         * 自定义指标数据
+         * @description value 仅支持纯数值组成的字符串（如 '546'）
+         */
+        metric?: Record<string, string>;
+        /** 接口调用成功的回调函数 */
+        success?: (res: ReportSceneSuccessResult) => void;
+        /** 接口调用失败的回调函数（含错误码/错误信息） */
+        fail?: (err: ReportSceneFailResult) => void;
+        /** 接口调用结束的回调函数（成功/失败都会执行） */
+        complete?: () => void;
     }
     /**
      * onError 全局错误事件回调参数类型
@@ -1287,6 +1459,363 @@ declare namespace BilibilWebMinigame {
         windowWidth: number;
         /** 变化后的窗口高度，单位：px */
         windowHeight: number;
+    }
+    /**
+     * DownloadTask.onProgressUpdate 下载进度回调参数类型
+     */
+    interface DownloadProgressUpdateResult {
+        /** 下载进度百分比 */
+        progress: number;
+        /** 已经下载的数据长度，单位：Bytes */
+        totalBytesWritten: number;
+        /** 预期需要下载的数据总长度，单位：Bytes */
+        totalBytesExpectedToWrite: number;
+    }
+
+    /**
+     * downloadFile 接口成功回调参数类型
+     */
+    interface DownloadFileSuccessResult {
+        /** 临时文件路径（未传入 filePath 时返回） */
+        tempFilePath: string;
+        /** 用户文件路径（传入 filePath 时返回，与传入值一致） */
+        filePath?: string;
+        /** 开发者服务器返回的 HTTP 状态码 */
+        statusCode: number;
+    }
+
+    /**
+     * downloadFile 接口调用参数类型
+     * @description 下载文件资源到本地，客户端发起 HTTPS GET 请求；需在服务端响应 header 中指定合理的 Content-Type
+     */
+    interface DownloadFileOptions {
+        /** 下载资源的 URL（必填） */
+        url: string;
+        /** HTTP 请求 Header（不能设置 Referer） */
+        header?: Record<string, string>;
+        /** 指定文件下载后存储的本地路径 */
+        filePath?: string;
+        /** 接口调用成功的回调函数 */
+        success?: (res: DownloadFileSuccessResult) => void;
+        /** 接口调用失败的回调函数 */
+        fail?: (err?: any) => void;
+        /** 接口调用结束的回调函数（成功/失败都会执行） */
+        complete?: () => void;
+    }
+
+    /**
+     * 下载任务对象（由 bl.downloadFile 返回）
+     * @platform 基础库 2.3.0+，低版本需做兼容处理
+     * @description 可监听下载进度、中断下载任务
+     */
+    interface DownloadTask {
+        /**
+         * 中断下载任务
+         */
+        abort: () => void;
+
+        /**
+         * 监听下载进度变化事件
+         * @param callback 进度变化触发的回调函数，返回下载进度、已下载字节数、总字节数
+         */
+        onProgressUpdate: (
+            callback: (res: DownloadProgressUpdateResult) => void,
+        ) => void;
+
+        /**
+         * 取消监听下载进度变化事件
+         * @param callback 要取消的、已绑定的进度回调函数
+         */
+        offProgressUpdate: (
+            callback: (res: DownloadProgressUpdateResult) => void,
+        ) => void;
+    }
+    /**
+     * request 接口的 HTTP 请求方法枚举
+     */
+    type RequestMethod =
+        | "OPTIONS"
+        | "GET"
+        | "HEAD"
+        | "POST"
+        | "PUT"
+        | "DELETE"
+        | "TRACE"
+        | "CONNECT";
+
+    /**
+     * request 接口的返回数据格式枚举
+     */
+    type RequestDataType = "json" | string;
+
+    /**
+     * request 接口的响应数据类型枚举
+     */
+    type RequestResponseType = "text" | "arraybuffer";
+
+    /**
+     * request 接口成功回调参数类型
+     */
+    interface RequestSuccessResult {
+        /** 开发者服务器返回的数据（类型由 responseType 决定） */
+        data: string | Record<string, any> | ArrayBuffer;
+        /** 开发者服务器返回的 HTTP 状态码 */
+        statusCode: number;
+        /** 开发者服务器返回的 HTTP Response Header */
+        header: Record<string, string>;
+    }
+
+    /**
+     * request 接口调用参数类型
+     * @description 发起 HTTPS 网络请求；header 中不能设置 Referer，content-type 默认为 application/json
+     */
+    interface RequestOptions {
+        /** 开发者服务器接口地址（必填） */
+        url: string;
+        /**
+         * 请求参数
+         * @description 最终会转为 String 类型：GET 转 query string、POST+application/json 转 JSON 序列化、POST+application/x-www-form-urlencoded 转 query string
+         */
+        data?: string | Record<string, any> | ArrayBuffer;
+        /** 请求头配置（不能设置 Referer） */
+        header?: Record<string, string>;
+        /** HTTP 请求方法，默认 GET */
+        method?: RequestMethod;
+        /** 返回数据格式，默认 json（json 类型会自动 JSON.parse，其他类型不处理） */
+        dataType?: RequestDataType;
+        /** 响应数据类型，默认 text */
+        responseType?: RequestResponseType;
+        /** 接口调用成功的回调函数 */
+        success?: (res: RequestSuccessResult) => void;
+        /** 接口调用失败的回调函数 */
+        fail?: (err?: any) => void;
+        /** 接口调用结束的回调函数（成功/失败都会执行） */
+        complete?: () => void;
+    }
+
+    /**
+     * 请求任务对象（由 bl.request 返回）
+     * @platform 基础库 1.4.0+，低版本需做兼容处理
+     * @description 用于管理网络请求任务（文档未提及具体方法，预留接口）
+     */
+    interface RequestTask {}
+    /**
+     * UploadTask.onProgressUpdate 上传进度回调参数类型
+     */
+    interface UploadProgressUpdateResult {
+        /** 上传进度百分比 */
+        progress: number;
+        /** 已经上传的数据长度，单位：Bytes */
+        totalBytesSent: number;
+        /** 预期需要上传的数据总长度，单位：Bytes */
+        totalBytesExpectedToSend: number;
+    }
+
+    /**
+     * UploadTask.onHeadersReceived HTTP 响应头回调参数类型
+     */
+    interface UploadHeadersReceivedResult {
+        /** 开发者服务器返回的 HTTP Response Header */
+        header: Record<string, string>;
+    }
+
+    /**
+     * uploadFile 接口成功回调参数类型
+     */
+    interface UploadFileSuccessResult {
+        /** 开发者服务器返回的数据 */
+        data: string;
+        /** 开发者服务器返回的 HTTP 状态码 */
+        statusCode: number;
+    }
+
+    /**
+     * uploadFile 接口调用参数类型
+     * @platform 基础库 2.6.0+，低版本需做兼容处理
+     * @description 上传本地资源到服务器，客户端发起 HTTPS POST 请求（content-type 为 multipart/form-data）；目前仅支持图片资源上传
+     */
+    interface UploadFileOptions {
+        /** 开发者服务器地址（必填） */
+        url: string;
+        /** 要上传文件资源的路径（必填，目前仅支持图片资源） */
+        filePath: string;
+        /** 文件对应的 key（必填，服务端通过此 key 获取文件二进制内容） */
+        name: string;
+        /** HTTP 请求 Header（不能设置 Referer） */
+        header?: Record<string, string>;
+        /** HTTP 请求中额外的 form data */
+        formData?: Record<string, any>;
+        /** 接口调用成功的回调函数 */
+        success?: (res: UploadFileSuccessResult) => void;
+        /** 接口调用失败的回调函数 */
+        fail?: (err?: any) => void;
+        /** 接口调用结束的回调函数（成功/失败都会执行） */
+        complete?: () => void;
+    }
+
+    /**
+     * 上传任务对象（由 bl.uploadFile 返回）
+     * @platform 基础库 2.6.0+，低版本需做兼容处理
+     * @description 可监听上传进度、HTTP 响应头事件，也可中断上传任务
+     * @example
+     * const tempFilePath = 'blfile://temp/example.jpg';
+     * const uploadTask = bl.uploadFile({
+     *     url: 'https://example.bilibili.com/upload', // 仅为示例，非真实的接口地址
+     *     filePath: tempFilePath,
+     *     name: 'file',
+     *     formData: {
+     *         user: 'test',
+     *     },
+     *     success(res) {
+     *         const data = res.data;
+     *         // do something
+     *     },
+     * });
+     *
+     * uploadTask.onProgressUpdate(res => {
+     *     console.log('上传进度', res.progress);
+     *     console.log('已经上传的数据长度', res.totalBytesSent);
+     *     console.log('预期需要上传的数据总长度', res.totalBytesExpectedToSend);
+     * });
+     *
+     * uploadTask.abort(); // 取消上传任务
+     */
+    interface UploadTask {
+        /**
+         * 中断上传任务
+         */
+        abort: () => void;
+
+        /**
+         * 监听上传进度变化事件
+         * @param callback 进度变化触发的回调函数，返回上传进度、已上传字节数、总字节数
+         */
+        onProgressUpdate: (
+            callback: (res: UploadProgressUpdateResult) => void,
+        ) => void;
+
+        /**
+         * 取消监听上传进度变化事件
+         * @param callback 要取消的、已绑定的进度回调函数
+         */
+        offProgressUpdate: (
+            callback: (res: UploadProgressUpdateResult) => void,
+        ) => void;
+
+        /**
+         * 监听 HTTP Response Header 事件（比请求完成事件更早触发）
+         * @param callback 响应头事件触发的回调函数，返回服务器响应头
+         */
+        onHeadersReceived: (
+            callback: (res: UploadHeadersReceivedResult) => void,
+        ) => void;
+
+        /**
+         * 取消监听 HTTP Response Header 事件
+         * @param callback 要取消的、已绑定的响应头回调函数
+         */
+        offHeadersReceived: (
+            callback: (res: UploadHeadersReceivedResult) => void,
+        ) => void;
+    }
+    /**
+     * connectSocket 接口调用参数类型
+     * @description 创建 WebSocket 连接，仅支持 wss 协议接口地址；Header 中不能设置 Referer
+     */
+    interface ConnectSocketOptions {
+        /** 开发者服务器 wss 接口地址（必填） */
+        url: string;
+        /** HTTP Header（不能设置 Referer） */
+        header?: Record<string, string>;
+        /** WebSocket 子协议数组 */
+        protocols?: string[];
+        /** 接口调用成功的回调函数 */
+        success?: () => void;
+        /** 接口调用失败的回调函数 */
+        fail?: (err?: any) => void;
+        /** 接口调用结束的回调函数（成功/失败都会执行） */
+        complete?: () => void;
+    }
+
+    /**
+     * SocketTask.onClose 连接关闭事件回调参数类型
+     * @description 贴合 WebSocket 标准关闭事件参数
+     */
+    interface SocketCloseResult {
+        /** 关闭状态码（符合 WebSocket 标准） */
+        code: number;
+        /** 关闭原因描述 */
+        reason: string;
+        /** 是否为正常关闭 */
+        wasClean: boolean;
+    }
+
+    /**
+     * SocketTask.onError 错误事件回调参数类型
+     */
+    interface SocketErrorResult {
+        /** 错误信息描述 */
+        errMsg: string;
+    }
+
+    /**
+     * SocketTask.onMessage 消息接收事件回调参数类型
+     */
+    interface SocketMessageResult {
+        /** 服务器返回的消息数据（支持字符串/ArrayBuffer） */
+        data: string | ArrayBuffer;
+        /** 数据类型（text/arraybuffer） */
+        type: "text" | "arraybuffer";
+    }
+
+    /**
+     * SocketTask.send 发送数据的参数类型
+     */
+    interface SocketSendOptions {
+        /** 要发送的数据（支持字符串/ArrayBuffer） */
+        data: string | ArrayBuffer;
+        /** 发送成功的回调函数 */
+        success?: () => void;
+        /** 发送失败的回调函数 */
+        fail?: (err?: SocketErrorResult) => void;
+        /** 发送结束的回调函数（成功/失败都会执行） */
+        complete?: () => void;
+    }
+
+    /**
+     * WebSocket 任务对象（由 bl.connectSocket 返回）
+     * @description 用于管理 WebSocket 连接，包含关闭、事件监听、发送数据等能力
+     */
+    interface SocketTask {
+        /**
+         * 关闭 WebSocket 连接
+         * @param callback 连接关闭后的回调函数
+         */
+        close: (callback?: (res?: SocketCloseResult) => void) => void;
+
+        /**
+         * 监听 WebSocket 连接关闭事件
+         * @param callback 连接关闭时触发的回调函数
+         */
+        onClose: (callback: (res: SocketCloseResult) => void) => void;
+
+        /**
+         * 监听 WebSocket 错误事件
+         * @param callback 错误发生时触发的回调函数
+         */
+        onError: (callback: (res: SocketErrorResult) => void) => void;
+
+        /**
+         * 监听 WebSocket 接收服务器消息事件
+         * @param callback 收到消息时触发的回调函数
+         */
+        onMessage: (callback: (res: SocketMessageResult) => void) => void;
+
+        /**
+         * 通过 WebSocket 连接发送数据
+         * @param options 发送数据及回调配置项
+         */
+        send: (options: SocketSendOptions) => void;
     }
     /**
      * Canvas.toTempFilePath/toTempFilePathSync 的文件类型枚举

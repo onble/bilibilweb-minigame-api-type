@@ -573,5 +573,137 @@ declare namespace BilibilWebMinigame {
         //#endregion 窗口
 
         //#endregion 界面
+
+        //#region 数据分析
+
+        /**
+         * 上报小游戏启动成功埋点
+         * @description 必须在游戏首页成功渲染时调用
+         */
+        launchSuccess: () => void;
+
+        /**
+         * 上报游戏启动阶段的自定义场景埋点
+         * @platform 基础库 3.99.9+，低版本需做兼容处理
+         * @param options 场景埋点配置项（含场景ID、耗时、自定义维度/指标）
+         * @example
+         * bl.reportScene({
+         *   sceneId: 7,
+         *   costTime: 350,
+         *   dimension: {
+         *     d1: '2.1.0', // value仅支持传入String类型。若value表示Boolean，请将值处理为'0'、'1'进行上报；若value为Number，请转换为String进行上报
+         *   },
+         *   metric: {
+         *     m1: '546', // value仅支持传入数值且需要转换为String类型进行上报
+         *   },
+         *   success (res) {
+         *     // 上报接口执行完成后的回调，用于检查上报数据是否符合预期
+         *     console.log(res)
+         *   },
+         *   fail (res) {
+         *     // 上报报错时的回调，用于查看上报错误的原因：如参数类型错误等
+         *     console.log(res)
+         *   }
+         * })
+         */
+        reportScene: (options: ReportSceneOptions) => void;
+
+        //#endregion 数据分析
+
+        //#region 网络
+
+        //#region 发起请求
+        /**
+         * 发起 HTTPS 网络请求
+         * @description 所有版本支持 request 种 cookie（下次同域名请求带入）；基础库 3.9.0+ 支持请求 *bilibili.com 域名接口时带上 app 登录信息
+         * @param options 网络请求配置项
+         * @returns 请求任务对象（基础库 1.4.0+ 支持）
+         * @example
+         * bl.request({
+         *     url: 'test.php', // 仅为示例，并非真实的接口地址
+         *     data: {
+         *         x: '',
+         *         y: '',
+         *     },
+         *     header: {
+         *         'content-type': 'application/json', // 默认值
+         *     },
+         *     success(res) {
+         *         console.log(res.data);
+         *     },
+         * });
+         */
+        request: (options: RequestOptions) => RequestTask;
+        //#endregion 发起请求
+
+        //#region 下载
+
+        /**
+         * 下载文件资源到本地（客户端发起 HTTPS GET 请求）
+         * @description 服务端需在响应 header 中指定合理的 Content-Type 以保证客户端正确处理文件类型
+         * @param options 文件下载配置项
+         * @returns 下载任务对象（基础库 2.3.0+ 支持）
+         * @example
+         * bl.downloadFile({
+         *     url: 'https://example.com/audio/123', // 仅为示例，并非真实的资源
+         *     success(res) {
+         *         // 只要服务器有响应数据，就会把响应内容写入文件并进入 success 回调，业务需要自行判断是否下载到了想要的内容
+         *         if (res.statusCode === 200) {
+         *             console.log(res.tempFilePath);
+         *         }
+         *     },
+         * });
+         */
+        downloadFile: (options: DownloadFileOptions) => DownloadTask;
+
+        //#endregion 下载
+
+        //#region 上传
+
+        /**
+         * 上传本地资源到服务器（客户端发起 HTTPS POST 请求，content-type 为 multipart/form-data）
+         * @platform 基础库 2.6.0+，低版本需做兼容处理
+         * @description 目前仅支持图片资源上传；header 中不能设置 Referer
+         * @param options 文件上传配置项
+         * @returns 上传任务对象（基础库 2.6.0+ 支持）
+         * @example
+         * const tempFilePath = 'blfile://temp/example.jpg';
+         * bl.uploadFile({
+         *     url: 'https://example.bilibili.com/upload', // 仅为示例，非真实的接口地址
+         *     filePath: tempFilePath,
+         *     name: 'file',
+         *     formData: {
+         *         user: 'test',
+         *     },
+         *     success(res) {
+         *         const data = res.data;
+         *         // do something
+         *     },
+         * });
+         */
+        uploadFile: (options: UploadFileOptions) => UploadTask;
+
+        //#endregion 上传
+
+        //#region WebSocket
+
+        /**
+         * 创建 WebSocket 连接（仅支持 wss 协议）
+         * @param options WebSocket 连接配置项
+         * @returns WebSocket 任务对象
+         * @example
+         * bl.connectSocket({
+         *   url: "wss://example.bilibili.com",
+         *   header: {
+         *     "content-type": "application/json"
+         *   },
+         *   protocols: ["protocol1"]
+         * });
+         */
+        connectSocket: (options: ConnectSocketOptions) => SocketTask;
+
+        //#endregion WebSocket
+
+        //#endregion 网络 
     }
 }
