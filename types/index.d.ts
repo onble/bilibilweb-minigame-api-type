@@ -705,5 +705,106 @@ declare namespace BilibilWebMinigame {
         //#endregion WebSocket
 
         //#endregion 网络 
+
+        //#region 转发
+
+        /**
+         * 显示当前页面的转发按钮
+         * @param options 转发按钮配置及回调项
+         * @example
+         * bl.showShareMenu({
+         * withShareTicket: true
+         * })
+         */
+        showShareMenu: (options?: ShowShareMenuOptions) => void;
+
+        /**
+         * 隐藏转发按钮
+         * @param options 回调配置项
+         * @example
+         * bl.hideShareMenu()
+         */
+        hideShareMenu: (options?: HideShareMenuOptions) => void;
+
+        /**
+         * 取消监听用户点击右上角「转发」按钮的事件
+         * @param callback 要取消的转发事件回调函数
+         */
+        offShareAppMessage: (
+            callback: () => ShareAppMessageConfig
+        ) => void;
+
+        /**
+         * 监听用户点击右上角「转发」按钮的事件
+         * @platform 基础库 3.8.0+，低版本需做兼容处理
+         * @param callback 转发事件触发的回调函数，返回分享配置
+         * @example
+         * bl.onShareAppMessage(() => {
+         *     return {
+         *         title: '转发标题',
+         *         subTitle: '转发副标题',
+         *         imageUrl: 'https://xxxx.png', // 图片 URL
+         *         query: 'key1=val1',
+         *     };
+         * });
+         * @example 对于不是 bilibili 域名的图片，可按如下方式处理
+         * // 第一步：下载文件到本地
+         * bl.downloadFile({
+         *     url: 'https://example.com/image/123',
+         *     success(res) {
+         *         if (res.statusCode === 200) {
+         *             // 第二步：直接使用临时文件作为分享图
+         *             bl.onShareAppMessage(() => {
+         *                 return {
+         *                     title: '转发标题',
+         *                     subTitle: '转发副标题',
+         *                     imageUrl: res.tempFilePath, // 图片 URL
+         *                     query: 'key1=val1',
+         *                 };
+         *             });
+         *         }
+         *     },
+         *     fail(err) {
+         *         console.log(err);
+         *     }
+         * });
+         */
+        onShareAppMessage: (
+            callback: () => ShareAppMessageConfig
+        ) => void;
+
+        /**
+         * 主动拉起分享，进入选择分享渠道界面
+         * @platform 基础库 3.8.0+，低版本需做兼容处理
+         * @param options 分享配置及回调项
+         * @example
+         * // 第一步：下载文件到本地
+         * bl.downloadFile({
+         *     url: 'https://example.com/image/123',
+         *     success(res) {
+         *         if (res.statusCode === 200) {
+         *             // 第二步：直接使用临时文件作为分享图
+         *             bl.shareAppMessage({
+         *                 title: '转发标题',
+         *                 subTitle: '转发副标题',
+         *                 imageUrl: res.tempFilePath,
+         *                 biliContent: '转发内容',
+         *                 success(res) {
+         *                     console.log(res);
+         *                 },
+         *                 fail(err) {
+         *                     console.log(err);
+         *                 }
+         *             });
+         *         }
+         *     },
+         *     fail(err) {
+         *         console.log(err);
+         *     }
+         * });
+         */
+        shareAppMessage: (options?: ShareAppMessageOptions) => void;
+
+        //#endregion 转发
     }
 }
