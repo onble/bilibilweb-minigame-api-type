@@ -1083,5 +1083,677 @@ declare namespace BilibilWebMinigame {
 
         //#endregion 文件
 
+        //#region 设备
+
+        //#region 蓝牙-通用
+
+        /**
+         * 初始化蓝牙模块
+         * @platform 基础库 3.73.0+
+         * @description iOS 上开启主机/从机模式时需分别调用一次，并指定对应的 mode；其他蓝牙 API 必须在该接口调用后使用
+         * @param options 初始化配置
+         * @example
+         * bl.openBluetoothAdapter({
+         *     mode: 'central',
+         *     success (res) { },
+         *     fail (err) { },
+         *     complete (result) { },
+         * })
+         */
+        openBluetoothAdapter: (options: OpenBluetoothAdapterOptions) => void;
+
+        /**
+         * 关闭蓝牙模块
+         * @platform 基础库 3.73.0+
+         * @description 断开所有已建立的连接并释放系统资源，建议与 openBluetoothAdapter 成对调用
+         * @param options 关闭配置
+         * @example
+         * bl.closeBluetoothAdapter({
+         *   success (res) {
+         *     console.log(res)
+         *   }
+         * })
+         */
+        closeBluetoothAdapter: (options: CloseBluetoothAdapterOptions) => void;
+
+        /**
+         * 开始搜寻附近的蓝牙外围设备
+         * @platform 基础库 3.73.0+
+         * @description 操作耗费系统资源，需及时调用 stopBluetoothDevicesDiscovery 停止搜索；安卓 6.0+ 无定位权限/开关未开时无法搜索
+         * @param options 搜索配置
+         * @example
+         * bl.startBluetoothDevicesDiscovery({
+         *   services: ['FEE7'],
+         *   success (res) {
+         *     console.log(res)
+         *   }
+         * })
+         */
+        startBluetoothDevicesDiscovery: (
+            options: StartBluetoothDevicesDiscoveryOptions
+        ) => void;
+
+        /**
+         * 停止搜寻附近的蓝牙外围设备
+         * @platform 基础库 3.73.0+
+         * @description 找到需要的设备后建议立即调用
+         * @param options 停止搜索配置
+         * @example
+         * bl.stopBluetoothDevicesDiscovery({
+         *   success (res) {
+         *     console.log(res)
+         *   }
+         * })
+         */
+        stopBluetoothDevicesDiscovery: (
+            options: StopBluetoothDevicesDiscoveryOptions
+        ) => void;
+
+        /**
+         * 根据主服务 UUID 获取已连接的蓝牙设备
+         * @platform 基础库 3.73.0+
+         * @param options 查询配置（必填 services）
+         * @example
+         * bl.getConnectedBluetoothDevices({
+         *   services: ['FEE7'],
+         *   success (res) {
+         *     console.log(res)
+         *   }
+         * })
+         */
+        getConnectedBluetoothDevices: (
+            options: GetConnectedBluetoothDevicesOptions
+        ) => void;
+
+        /**
+         * 获取在蓝牙模块生效期间所有搜索到的蓝牙设备
+         * @platform 基础库 3.73.0+
+         * @description 包含已连接设备；若未及时关闭蓝牙模块，可能返回已离开的设备
+         * @param options 查询配置
+         * @example
+         *          * // ArrayBuffer转16进度字符串示例
+         * function ab2hex(buffer) {
+         *   var hexArr = Array.prototype.map.call(
+         *     new Uint8Array(buffer),
+         *     function(bit) {
+         *       return ('00' + bit.toString(16)).slice(-2)
+         *     }
+         *   )
+         *   return hexArr.join('');
+         * }
+         * bl.getBluetoothDevices({
+         *   success: function (res) {
+         *     console.log(res)
+         *     if (res.devices[0]) {
+         *       console.log(ab2hex(res.devices[0].advertisData))
+         *     }
+         *   }
+         * })
+         */
+        getBluetoothDevices: (options: GetBluetoothDevicesOptions) => void;
+
+        /**
+         * 获取本机蓝牙适配器状态
+         * @platform 基础库 3.73.0+
+         * @param options 查询配置
+         * @example
+         * bl.getBluetoothAdapterState({
+         *   success (res) {
+         *     console.log(res)
+         *   }
+         * })
+         */
+        getBluetoothAdapterState: (options: GetBluetoothAdapterStateOptions) => void;
+
+        /**
+         * 监听搜索到新设备的事件
+         * @platform 基础库 3.73.0+
+         * @param callback 新设备发现回调
+         * @example
+         * // ArrayBuffer转16进度字符串示例
+         * function ab2hex(buffer) {
+         *   var hexArr = Array.prototype.map.call(
+         *     new Uint8Array(buffer),
+         *     function(bit) {
+         *       return ('00' + bit.toString(16)).slice(-2)
+         *     }
+         *   )
+         *   return hexArr.join('');
+         * }
+         * bl.onBluetoothDeviceFound(function(res) {
+         *   var devices = res.devices;
+         *   console.log('new device list has founded')
+         *   console.dir(devices)
+         *   console.log(ab2hex(devices[0].advertisData))
+         * })
+         */
+        onBluetoothDeviceFound: (callback: BluetoothDeviceFoundCallback) => void;
+
+        /**
+         * 监听蓝牙适配器状态变化事件
+         * @platform 基础库 3.73.0+
+         * @param callback 状态变化回调
+         * @example
+         * bl.onBluetoothAdapterStateChange(function (res) {
+         *   console.log('adapterState changed, now is', res)
+         * })
+         */
+        onBluetoothAdapterStateChange: (
+            callback: BluetoothAdapterStateChangeCallback
+        ) => void;
+
+        /**
+         * 取消监听寻找到新设备的事件
+         * @platform 基础库 3.73.0+
+         * @param callback 要取消的回调函数（不传则取消所有）
+         * @example
+         * bl.offBluetoothDeviceFound()
+         */
+        offBluetoothDeviceFound: (callback?: BluetoothDeviceFoundCallback) => void;
+
+        /**
+         * 取消监听蓝牙适配器状态变化事件
+         * @platform 基础库 3.73.0+
+         * @param callback 要取消的回调函数（不传则取消所有）
+         * @example
+         * bl.offBluetoothAdapterStateChange()
+         */
+        offBluetoothAdapterStateChange: (
+            callback?: BluetoothAdapterStateChangeCallback
+        ) => void;
+
+        /**
+         * 查询蓝牙设备是否配对
+         * @platform Android、基础库 3.73.0+
+         * @param options 查询配置（必填 deviceId）
+         */
+        isBluetoothDevicePaired: (options: IsBluetoothDevicePairedOptions) => void;
+
+        //#endregion 蓝牙-通用
+
+        //#region 蓝牙-低功耗中心设备
+
+        /**
+         * 连接蓝牙低功耗设备
+         * @platform 基础库 3.73.0+
+         * @description 建议与 closeBLEConnection 成对调用；安卓重复调用可能导致多连接实例
+         * @param options 连接配置
+         * @example
+         * bl.createBLEConnection({
+         *   deviceId,
+         *   success (res) {
+         *     console.log(res)
+         *   }
+         * })
+         */
+        createBLEConnection: (options: CreateBLEConnectionOptions) => void;
+
+        /**
+         * 断开与蓝牙低功耗设备的连接
+         * @platform 基础库 3.73.0+
+         * @param options 断开连接配置
+         * @example
+         * bl.closeBLEConnection({
+         *   deviceId,
+         *   success (res) {
+         *     console.log(res)
+         *   }
+         * })
+         */
+        closeBLEConnection: (options: CloseBLEConnectionOptions) => void;
+
+        /**
+         * 获取蓝牙低功耗设备所有服务
+         * @platform 基础库 3.73.0+
+         * @description 需先通过 createBLEConnection 建立连接
+         * @param options 查询配置
+         * @example
+         * bl.getBLEDeviceServices({
+         *   // 这里的 deviceId 需要已经通过 bl.createBLEConnection 与对应设备建立连接
+         *   deviceId,
+         *   success (res) {
+         *     console.log('device services:', res.services)
+         *   }
+         * })
+         */
+        getBLEDeviceServices: (options: GetBLEDeviceServicesOptions) => void;
+
+        /**
+         * 获取蓝牙低功耗设备某个服务的所有特征
+         * @platform 基础库 3.73.0+
+         * @description 需先通过 getBLEDeviceServices 获取 serviceId
+         * @param options 查询配置
+         * @example
+         * bl.getBLEDeviceCharacteristics({
+         *   // 这里的 deviceId 需要已经通过 bl.createBLEConnection 与对应设备建立链接
+         *   deviceId,
+         *   // 这里的 serviceId 需要在 bl.getBLEDeviceServices 接口中获取
+         *   serviceId,
+         *   success (res) {
+         *     console.log('device getBLEDeviceCharacteristics:', res.characteristics)
+         *   }
+         * })
+         */
+        getBLEDeviceCharacteristics: (
+            options: GetBLEDeviceCharacteristicsOptions
+        ) => void;
+
+        /**
+         * 获取蓝牙低功耗的最大传输单元
+         * @platform 基础库 3.73.0+
+         * @description 需在 createBLEConnection 成功后调用；iOS MTU 固定，安卓需监听 onBLEMTUChange
+         * @param options 查询配置
+         * @example
+         * bl.getBLEMTU({
+         *   deviceId: '',
+         *   writeType: 'write',
+         *   success (res) {
+         *     console.log(res)
+         *   }
+         * })
+         */
+        getBLEMTU: (options: GetBLEMTUOptions) => void;
+
+        /**
+         * 获取蓝牙低功耗设备的信号强度
+         * @platform 基础库 3.73.0+
+         * @param options 查询配置
+         * @example
+         * bl.getBLEDeviceRSSI({
+         *   deviceId,
+         *   success (res) {
+         *     console.log('device RSSI:', res.RSSI)
+         *   }
+         * })
+         */
+        getBLEDeviceRSSI: (options: GetBLEDeviceRSSIOptions) => void;
+
+        /**
+         * 启用/关闭特征值变化的 notify 功能
+         * @platform 基础库 3.73.0+
+         * @description 必须特征支持 notify/indicate 才能调用；启用后才能监听 characteristicValueChange 事件
+         * @param options 订阅配置
+         * @example
+         * bl.notifyBLECharacteristicValueChange({
+         *   state: true, // 启用 notify 功能
+         *   // 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立链接
+         *   deviceId,
+         *   // 这里的 serviceId 需要在 getBLEDeviceServices 接口中获取
+         *   serviceId,
+         *   // 这里的 characteristicId 需要在 getBLEDeviceCharacteristics 接口中获取
+         *   characteristicId,
+         *   success (res) {
+         *     console.log('notifyBLECharacteristicValueChange success', res.errMsg)
+         *   }
+         * })
+         */
+        notifyBLECharacteristicValueChange: (
+            options: NotifyBLECharacteristicValueChangeOptions
+        ) => void;
+
+        /**
+         * 读取蓝牙低功耗设备特征值的二进制数据
+         * @platform 基础库 3.73.0+
+         * @description 必须特征支持 read；读取结果需在 onBLECharacteristicValueChange 回调中获取
+         * @param options 读取配置
+         * @example
+         * // 必须在这里的回调才能获取
+         * bl.onBLECharacteristicValueChange(function(characteristic) {
+         *   console.log('characteristic value comed:', characteristic)
+         * })
+         * bl.readBLECharacteristicValue({
+         *   // 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立链接
+         *   deviceId,
+         *   // 这里的 serviceId 需要在 getBLEDeviceServices 接口中获取
+         *   serviceId,
+         *   // 这里的 characteristicId 需要在 getBLEDeviceCharacteristics 接口中获取
+         *   characteristicId,
+         *   success (res) {
+         *     console.log('readBLECharacteristicValue:', res.errCode)
+         *   }
+         * })
+         */
+        readBLECharacteristicValue: (
+            options: ReadBLECharacteristicValueOptions
+        ) => void;
+
+        /**
+         * 向蓝牙低功耗设备特征值写入二进制数据
+         * @platform 基础库 3.73.0+
+         * @description 必须特征支持 write；单次写入建议不超过 20 字节
+         * @param options 写入配置
+         * @example
+         * // 向蓝牙设备发送一个0x00的16进制数据
+         * let buffer = new ArrayBuffer(1)
+         * let dataView = new DataView(buffer)
+         * dataView.setUint8(0, 0)
+         * bl.writeBLECharacteristicValue({
+         *   // 这里的 deviceId 需要在 getBluetoothDevices 或 onBluetoothDeviceFound 接口中获取
+         *   deviceId,
+         *   // 这里的 serviceId 需要在 getBLEDeviceServices 接口中获取
+         *   serviceId,
+         *   // 这里的 characteristicId 需要在 getBLEDeviceCharacteristics 接口中获取
+         *   characteristicId,
+         *   // 这里的value是ArrayBuffer类型
+         *   value: buffer,
+         *   success (res) {
+         *     console.log('writeBLECharacteristicValue success', res.errMsg)
+         *   }
+         * })
+         */
+        writeBLECharacteristicValue: (
+            options: WriteBLECharacteristicValueOptions
+        ) => void;
+
+        /**
+         * 协商设置蓝牙低功耗的最大传输单元（仅 Android 支持）
+         * @platform Android、基础库 3.73.0+
+         * @description 仅安卓 5.1+ 有效；MTU 范围 22 < mtu ≤ 512
+         * @param options MTU 配置
+         * @example
+         * // 必须在这里的回调才能获取
+         * bl.onBLECharacteristicValueChange(function(characteristic) {
+         *   console.log('characteristic value comed:', characteristic)
+         * })
+         * bl.setBLEMTU({
+         *   // 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立链接
+         *   deviceId,
+         *   mtu,
+         *   success (res) {
+         *     console.log('setBLEMTU:', res.mtu)
+         *   }
+         * })
+         */
+        setBLEMTU: (options: SetBLEMTUOptions) => void;
+
+        /**
+         * 监听蓝牙低功耗连接状态的改变事件
+         * @platform 基础库 3.73.0+
+         * @param callback 状态变化回调
+         * @example
+         * bl.onBLEConnectionStateChange(function(res) {
+         *   // 该方法回调中可以用于处理连接意外断开等异常情况
+         *   console.log(`device ${res.deviceId} state has changed, connected: ${res.connected}`)
+         * })
+         */
+        onBLEConnectionStateChange: (
+            callback: BLEConnectionStateChangeCallback
+        ) => void;
+
+        /**
+         * 监听蓝牙低功耗设备的特征值变化事件
+         * @platform 基础库 3.73.0+
+         * @description 需先调用 notifyBLECharacteristicValueChange 启用订阅
+         * @param callback 特征值变化回调
+         * @example
+         * // ArrayBuffer转16进制字符串示例
+         * function ab2hex(buffer) {
+         *   let hexArr = Array.prototype.map.call(
+         *     new Uint8Array(buffer),
+         *     function(bit) {
+         *       return ('00' + bit.toString(16)).slice(-2)
+         *     }
+         *   )
+         *   return hexArr.join('');
+         * }
+         * bl.onBLECharacteristicValueChange(function(res) {
+         *   console.log(`characteristic ${res.characteristicId} has changed, now is ${res.value}`)
+         *   console.log(ab2hex(res.value))
+         * })
+         */
+        onBLECharacteristicValueChange: (
+            callback: BLECharacteristicValueChangeCallback
+        ) => void;
+
+        /**
+         * 监听蓝牙低功耗的最大传输单元变化事件（仅 Android 支持）
+         * @platform Android、基础库 3.73.0+
+         * @param callback MTU 变化回调
+         * @example
+         * bl.onBLEMTUChange(function (res) {
+         *   console.log('bluetooth mtu is', res.mtu)
+         * })
+         */
+        onBLEMTUChange: (callback: BLEMTUChangeCallback) => void;
+
+        /**
+         * 取消监听蓝牙低功耗连接状态的改变事件
+         * @platform 基础库 3.73.0+
+         * @param callback 要取消的回调函数（不传则取消所有）
+         * @example
+         * bl.offBLEConnectionStateChange()
+         */
+        offBLEConnectionStateChange: (
+            callback?: BLEConnectionStateChangeCallback
+        ) => void;
+
+        /**
+         * 取消监听蓝牙低功耗设备的特征值变化事件
+         * @platform 基础库 3.73.0+
+         * @param callback 要取消的回调函数（不传则取消所有）
+         * @example
+         * bl.offBLECharacteristicValueChange()
+         */
+        offBLECharacteristicValueChange: (
+            callback?: BLECharacteristicValueChangeCallback
+        ) => void;
+
+        /**
+         * 取消监听蓝牙低功耗的最大传输单元变化事件（仅 Android 支持）
+         * @platform Android、基础库 3.73.0+
+         * @param callback 要取消的回调函数（不传则取消所有）
+         * @example
+         * bl.offBLEMTUChange()
+         */
+        offBLEMTUChange: (callback?: BLEMTUChangeCallback) => void;
+
+        //#endregion 蓝牙-低功耗中心设备
+
+        //#region 蓝牙-低功耗外围设备
+
+        /**
+         * 建立本地作为蓝牙低功耗外围设备的服务端（可创建多个）
+         * @platform 基础库 3.73.0+
+         * @param options 创建配置
+         * @example
+         * bl.createBLEPeripheralServer({
+         *   success (res) {
+         *     console.log(res)
+         *   }
+         * })
+         */
+        createBLEPeripheralServer: (
+            options: CreateBLEPeripheralServerOptions
+        ) => void;
+
+        /**
+         * 监听当前外围设备被连接或断开连接事件（仅 Android 支持）
+         * @platform Android、基础库 3.73.0+
+         * @param callback 连接状态变化回调
+         * @example
+         * bl.onBLEPeripheralConnectionStateChanged(function (res) {
+         *   console.log('bluetooth state changed', res)
+         * })
+         */
+        onBLEPeripheralConnectionStateChanged: (
+            callback: BLEPeripheralConnectionStateChangedCallback
+        ) => void;
+
+        /**
+         * 取消监听当前外围设备被连接或断开连接事件
+         * @platform 基础库 3.73.0+
+         * @param callback 要取消的回调函数（不传则取消所有）
+         * @example
+         * bl.offBLEPeripheralConnectionStateChanged()
+         */
+        offBLEPeripheralConnectionStateChanged: (
+            callback?: BLEPeripheralConnectionStateChangedCallback
+        ) => void;
+
+        //#endregion 蓝牙-低功耗外围设备
+
+        //#region 电量
+
+        /**
+         * 获取设备电量（同步版本）
+         * @platform 基础库 3.20.0+（isLowPowerMode 字段）
+         * @returns 设备电量信息
+         */
+        getBatteryInfoSync: () => BatteryInfoResult;
+
+        /**
+         * 获取设备电量（异步版本）
+         * @platform 基础库 3.20.0+（isLowPowerMode 字段）
+         * @param options 异步配置参数
+         */
+        getBatteryInfo: (options: GetBatteryInfoOptions) => void;
+
+        //#endregion 电量
+
+        //#region 剪切板
+
+        /**
+         * 设置系统剪贴板的内容
+         * @platform 基础库通用
+         * @param options 剪贴板设置配置（必填 data 字段）
+         * @example
+         * bl.setClipboardData({
+         *   data: 'data',
+         *   success(res) {
+         *     bl.getClipboardData({
+         *       success(res) {
+         *         console.log(res.data) // data
+         *       }
+         *     })
+         *   }
+         * })
+         */
+        setClipboardData: (options: SetClipboardDataOptions) => void;
+
+        /**
+         * 获取系统剪贴板的内容
+         * @platform 基础库通用
+         * @param options 剪贴板获取配置
+         * @example
+         * bl.getClipboardData({
+         *   success(res) {
+         *     console.log(res.data)
+         *   }
+         * })
+         */
+        getClipboardData: (options: GetClipboardDataOptions) => void;
+
+        //#endregion 剪切板
+
+        //#region 设备方向
+
+        /**
+         * 监听设备方向变化事件
+         * @platform 基础库通用
+         * @description 频率由 startDeviceMotionListening 的 interval 参数控制
+         * @param callback 设备方向变化回调
+         */
+        onDeviceMotionChange: (callback: DeviceMotionChangeCallback) => void;
+
+        /**
+         * 取消监听设备方向变化事件
+         * @platform 基础库通用
+         * @param callback 要取消的回调（不传则取消所有）
+         */
+        offDeviceMotionChange: (callback?: DeviceMotionChangeCallback) => void;
+
+        /**
+         * 开始监听设备方向的变化
+         * @platform 基础库通用
+         * @param options 监听配置（含回调频率）
+         */
+        startDeviceMotionListening: (
+            options?: StartDeviceMotionListeningOptions
+        ) => void;
+
+        /**
+         * 停止监听设备方向的变化
+         * @platform 基础库通用
+         * @param options 停止监听配置
+         */
+        stopDeviceMotionListening: (options?: StopDeviceMotionListeningOptions) => void;
+
+        /**
+         * 设置当前设备方向
+         * @platform 基础库 3.6.0+、iOS/Android App 6.0.0+
+         * @param options 方向配置（必填 newValue）
+         */
+        setDeviceOrientation: (options: SetDeviceOrientationOptions) => void;
+
+        /**
+         * 根据 game.json 配置恢复当前设备方向
+         * @platform 基础库通用
+         * @param options 恢复配置
+         */
+        restoreDeviceOrientation: (options?: RestoreDeviceOrientationOptions) => void;
+
+        /**
+         * 获取当前设备方向（同步接口）
+         * @platform 基础库通用
+         * @returns 设备方向（portrait/landscape）
+         */
+        getDeviceOrientationSync: () => DeviceOrientation;
+
+        //#endregion 设备方向
+
+        //#region 网络
+
+        /**
+        * 监听网络状态变化事件
+        * @platform 基础库通用（5g 字段 3.20.0+ 支持）
+        * @param callback 网络状态变化回调
+        * @example
+        * bl.onNetworkStatusChange(function (res) {
+         *   console.log(res.isConnected)
+         *   console.log(res.networkType)
+         * })
+        */
+        onNetworkStatusChange: (callback: NetworkStatusChangeCallback) => void;
+
+        /**
+         * 获取网络类型
+         * @platform 基础库通用（5g 字段 3.20.0+ 支持）
+         * @param options 获取网络类型配置
+         * @example
+         * bl.getNetworkType({
+         *   success(res) {
+         *     const networkType = res.networkType
+         *   }
+         * })
+         */
+        getNetworkType: (options?: GetNetworkTypeOptions) => void;
+
+        //#endregion 网络
+
+        //#region 震动
+
+        //#endregion 震动
+
+        //#region 性能
+
+        //#endregion 性能
+
+        //#region 屏幕
+
+        //#endregion 屏幕
+
+        //#region 加速计
+
+        //#endregion 加速计
+
+        //#region 罗盘
+
+        //#endregion 罗盘
+
+        //#region 陀螺仪
+
+        //#endregion 陀螺仪
+
+        //#endregion 设备
     }
 }
