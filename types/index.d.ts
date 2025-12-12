@@ -1055,5 +1055,33 @@ declare namespace BilibilWebMinigame {
 
         //#endregion 媒体
 
+        //#region 位置
+
+        /**
+         * 获取当前的地理位置、速度
+         * @description 1. 用户离开小游戏后此接口无法调用；2. 使用第三方服务逆地址解析时，需确认坐标系并做好坐标转换
+         * @param options 地理位置获取配置项（仅包含回调）
+         * @example
+         * bl.getLocation({
+         *   success(res) {
+         *     const latitude = res.latitude
+         *     const longitude = res.longitude
+         *   }
+         * })
+         */
+        getLocation: (options?: GetLocationOptions) => void;
+
+        //#endregion 位置
+
+        //#region 文件
+
+        /**
+        * 获取全局唯一的文件管理器对象
+        * @returns FileSystemManager 实例（包含所有文件/目录操作方法）
+        */
+        getFileSystemManager: () => FileSystemManager;
+
+        //#endregion 文件
+
     }
 }
