@@ -1937,5 +1937,512 @@ declare namespace BilibilWebMinigame {
         //#endregion 陀螺仪
 
         //#endregion 设备
+
+        //#region 开放接口
+
+        //#region 小游戏跳转
+
+        /**
+         * 打开另一个小游戏
+         * @platform 基础库通用
+         * @description 1. 需要用户确认跳转，取消则回调 fail(cancel)；2. 目标 appId 需在配置名单内（≤10 个），否则回调 fail(appId 不在列表)；3. 仅当前小游戏为开发/体验版时 envVersion 生效
+         * @param options 跳转配置（必填 appId/vAppId）
+         * @example
+         * bl.navigateToMiniProgram({
+         *   appId: '',
+         *   path: 'page/index/index?id=123',
+         *   extraData: {
+         *     foo: 'bar'
+         *   },
+         *   success(res) {
+         *     // 打开成功
+         *   }
+         * })
+         */
+        navigateToMiniProgram: (options: NavigateToMiniProgramOptions) => void;
+
+        //#endregion 小游戏跳转
+
+        //#region APP更新
+
+        /**
+         * 更新哔哩哔哩版本
+         * @platform iOS 基础库 3.22.0+、Android 基础库 3.23.0+
+         * @description 触发哔哩哔哩客户端的版本更新流程，具体更新逻辑由客户端处理
+         * @param options 更新配置
+         * @example
+         * bl.updateApp({
+         *     success: function() {
+         *         console.log('updateApp success')
+         *     },
+         *     fail: function() {
+         *         console.log('updateApp fail')
+         *     },
+         *     complete: function() {
+         *         console.log('updateApp complete')
+         *     }
+         * })
+         */
+        updateApp: (options?: UpdateAppOptions) => void;
+
+        //#endregion APP更新
+
+        //#region 跳转站内链接
+
+        /**
+         * 小游戏跳转站内链接
+         * @platform 基础库 2.5.0+（低版本需做兼容处理）
+         * @description 跳转链接为固定格式（如 bilibili://game_center），需联系小游戏运营同学获取合法链接
+         * @param options 跳转配置（必填 path 字段）
+         * @example
+         * bl.openURL({
+         *     path: 'bilibili://game_center',
+         *     success() {
+         *         console.log('success');
+         *     },
+         *     fail() {
+         *         console.log('fail');
+         *     },
+         * });
+         */
+        openURL: (options: OpenURLOptions) => void;
+
+        //#endregion 跳转站内链接
+
+        //#region 跳转站内视频链接
+
+        /**
+         * 小游戏跳转站内视频播放页
+         * @platform 基础库通用
+         * @description 支持指定视频 id 和集数，跳转至B站站内视频播放页面
+         * @param options 跳转配置（必填 id 字段）
+         * @example
+         * bl.openVideoDetail({
+         *   id: "87880470",
+         *   options: {
+         *     p: 2 //视频选集第二集
+         *   },
+         *   success() {
+         *     console.log("success");
+         *   },
+         *   fail() {
+         *     console.log("fail");
+         *   },
+         *   complete() {
+         *     console.log("complete");
+         *   }
+         * });
+         */
+        openVideoDetail: (options: OpenVideoDetailOptions) => void;
+
+        //#endregion 跳转站内视频链接
+
+        //#region 用户信息
+
+        /**
+         * 获取用户信息
+         * @platform 基础库通用
+         * @description withCredentials=true 时需已登录且登录态未过期，返回 encryptedData/iv；false 时无敏感信息
+         * @param options 获取用户信息配置
+         * @example
+         * // 检查登录态是否过期
+         * bl.checkSession({
+         *     success() {
+         *         // 如果登录态未失效，可以直接调用 getUserInfo 获取头像昵称等
+         *         bl.getUserInfo({
+         *             success(res) {
+         *                 console.log(res.userInfo);
+         *             }
+         *         });
+         *     },
+         *     fail() {
+         *         // 如果登录态失效，重新登录
+         *         bl.login({
+         *             success() {
+         *                 bl.getUserInfo({
+         *                     success(res) {
+         *                         console.log(res.userInfo);
+         *                     }
+         *                 });
+         *             },
+         *             fail() {}
+         *         })
+         *     }
+         * });
+         */
+        getUserInfo: (options?: GetUserInfoOptions) => void;
+
+        /**
+         * 创建用户信息按钮
+         * @platform 基础库 2.3.0+（低版本需兼容）
+         * @param options 按钮配置
+         * @returns 用户信息按钮实例
+         * @example
+         * const button = bl.createUserInfoButton({
+         *     type: 'text',
+         *     text: '获取用户信息',
+         *     style: {
+         *         left: 0,
+         *         top: 0,
+         *         width: 200,
+         *         height: 40,
+         *         color: '#0000ff',
+         *         backgroundColor: '#ff0000',
+         *         borderColor: '#000000',
+         *         borderWidth: 1,
+         *         borderRadius: 4,
+         *         textAlign: 'center',
+         *         fontSize: 16,
+         *         lineHeight: 40,
+         *     },
+         *     withCredentials: false,
+         * });
+         * button.onTap(res => {
+         *     console.log(res);
+         * });
+         */
+        createUserInfoButton: (
+            options: CreateUserInfoButtonOptions
+        ) => UserInfoButton;
+
+        /**
+         * 监听实名认证状态完成事件
+         * @platform Android、基础库 3.99.6+（低版本需兼容）
+         * @description 用户未实名时打开游戏弹实名框，操作后触发回调；返回值用于配置弹窗文案
+         * @param callback 实名认证状态回调（必填）
+         * @example
+         * bl.onRealNameAuthenticationComplete((res) => {
+         *     console.log('获取实名认证状态:', res.status);
+         *     return {
+         *         title: '有礼待领取哦',
+         *         content: '完成实名认证即可畅玩小游戏～每日都有礼包可领取～确认离开吗？', 
+         *         giftImgUrl: '//i0.hdslb.com/bfs/activity-plat/static/20240424/7b925ef85373a2241dca64f5ae8d938b/TgHwcHTp1L.jpg',
+         *         cancelText:'认证领礼包',
+         *         confirmText:'离开小游戏'
+         *     };
+         * });
+         */
+        onRealNameAuthenticationComplete: (callback: RealNameAuthCallback) => void;
+
+        //#endregion 用户信息
+
+        //#region 关注
+
+        /**
+         * 获取当前小游戏是否被用户关注过
+         * @platform 基础库 2.3.0+（低版本需做兼容处理）
+         * @param options 接口配置
+         * @example
+         * bl.getGameFollowingStatus({
+         *     success(res) {
+         *         console.log('success', res.follow);
+         *     },
+         *     fail(res) {
+         *         console.log('fail', res);
+         *     },
+         *     complete(res) {
+         *         console.log('complete', res);
+         *     },
+         * });
+         */
+        getGameFollowingStatus: (options?: GetGameFollowingStatusOptions) => void;
+
+        /**
+         * 注册胶囊菜单关注事件
+         * @platform 基础库 3.0.0+（低版本需做兼容处理）
+         * @description 仅在用户关注成功时触发，取消关注/关注失败不触发
+         * @param callback 关注成功回调
+         * @example
+         * bl.onGameFollowedFromMenu(function() {
+         *   console.log("game followed");
+         * });
+         */
+        onGameFollowedFromMenu: (callback: GameFollowedFromMenuCallback) => void;
+
+        /**
+         * 取消注册胶囊菜单关注事件
+         * @platform 基础库 3.8.0+（低版本需做兼容处理）
+         * @param callback 要取消的回调（不传则取消所有）
+         */
+        offGameFollowedFromMenu: (callback?: GameFollowedFromMenuCallback) => void;
+
+        /**
+         * 获取当前小游戏对应UP主是否被用户关注过
+         * @platform 基础库 3.0.0+（低版本需做兼容处理）
+         * @description UP主默认为小游戏绑定的管理员，修改需联系运营
+         * @param options 接口配置
+         * @example
+         * bl.getGameUpperFollowingStatus({
+         *   success(res) {
+         *     console.log("success", res.follow);
+         *   },
+         *   fail() {
+         *     console.log("fail");
+         *   },
+         *   complete() {
+         *     console.log("complete");
+         *   }
+         * });
+         */
+        getGameUpperFollowingStatus: (
+            options?: GetGameUpperFollowingStatusOptions
+        ) => void;
+
+        /**
+         * 关注当前小游戏对应的UP主
+         * @platform 基础库 3.0.0+（低版本需做兼容处理）
+         * @description 1. 需在 getGameUpperFollowingStatus 成功回调内调用；2. UP主默认为小游戏绑定的管理员，修改需联系运营
+         * @param options 接口配置
+         * @example
+         * bl.getGameUpperFollowingStatus({
+         *   success(res) {
+         *     // 在bl.getGameUpperFollowingStatus的成功回调内调用
+         *     if (!res.follow) {
+         *       bl.followGameUpper({
+         *         success(res) {
+         *           console.log("success");
+         *         },
+         *         fail(res) {
+         *           console.log("fail");
+         *         },
+         *         complete(res) {
+         *           console.log("complete");
+         *         }
+         *       });
+         *     }
+         *   }
+         * });
+         */
+        followGameUpper: (options?: FollowGameUpperOptions) => void;
+
+        //#endregion 关注
+
+        //#region 邀请
+
+        /**
+         * 获取邀请新用户赠大会员活动列表
+         * @platform 开放数据域、基础库通用
+         * @description 1. 仅开放数据域可用；2. 调用前需已调用 bl.login（建议 onLaunch 中调用）；3. start/end 为 13 位时间戳
+         * @param options 接口配置（必填 start/end）
+         * @example
+         * // 开放域中
+         * bl.getInvitationData({
+         *   start: new Date(2019, 11, 3, 19, 15, 28).getTime(), // 2019年12月3日 19:15:28
+         *   end: Date.now(),
+         *   success(res) {
+         *     console.log(res);
+         *   },
+         *   fail() {},
+         *   complete() {}
+         * });
+         */
+        getInvitationData: (options: GetInvitationDataOptions) => void;
+
+        /**
+         * 获取指定邀请赠大会员活动详情
+         * @platform 开放数据域、基础库通用
+         * @description 1. 仅开放数据域可用；2. 调用前需已调用 bl.login；3. pageSize 最大 100，默认 10；pageNum 默认 1
+         * @param options 接口配置（必填 activityId）
+         * @example
+         * // 开放域中
+         * bl.getInvitationDetail({
+         *   activityId: 123456,
+         *   pageSize: 20,
+         *   pageNum: 3,
+         *   success(res) {
+         *     console.log(res);
+         *   },
+         *   fail() {},
+         *   complete() {}
+         * });
+         */
+        getInvitationDetail: (options: GetInvitationDetailOptions) => void;
+
+        /**
+         * 领取邀请赠大会员活动奖励
+         * @platform 开放数据域、基础库通用
+         * @description 1. 仅开放数据域可用；2. 调用前需已调用 bl.login；3. activityId 从 getInvitationData 返回
+         * @param options 接口配置（必填 activityId）
+         * @example
+         * // 开放域中
+         * bl.getInvitationReward({
+         *   activityId: 123456, // 活动 id，可以从 bl.getInvitationData 返回信息中获取
+         *   success(res) {
+         *     console.log(res);
+         *   },
+         *   fail() {},
+         *   complete() {}
+         * });
+         */
+        getInvitationReward: (options: GetInvitationRewardOptions) => void;
+
+        //#endregion 邀请
+
+        //#region 赠送头像框
+
+        /**
+         * 小游戏内赠送头像框
+         * @platform 基础库通用
+         * @description 1. 调用前需已成功调用 bl.login（建议在 onLaunch 生命周期内调用）；2. activityId 为挂件发放活动唯一 id，需联系运营同学获取；3. expire 为挂件使用时间（单位：天），需联系运营同学获取
+         * @param options 赠送头像框配置（必填 activityId/expire）
+         * @example
+         * bl.presentPendant({
+         *   activityId: 123456,
+         *   expire: 5,
+         *   success() {
+         *     console.log("赠送挂件成功");
+         *   },
+         *   fail() {}
+         * });
+         */
+        presentPendant: (options: PresentPendantOptions) => void;
+
+        //#endregion 赠送头像框
+
+        //#region 登录
+
+        /**
+         * 检查登录态是否过期
+         * @platform 基础库通用
+         * @description 1. 登录态时效性由B站维护，开发者仅需检测有效性；2. 成功=session_key 未过期，失败=已过期需重新登录；3. 登录态在小游戏生命周期内有效（未过期时）
+         * @param options 接口配置
+         * @example
+         * bl.checkSession({
+         *   success() {
+         *     // session_key 未过期，并且在本生命周期一直有效
+         *   },
+         *   fail() {
+         *     // session_key 已经失效，需要重新执行登录流程
+         *     bl.login() // 重新登录
+         *   }
+         * })
+         */
+        checkSession: (options?: CheckSessionOptions) => void;
+
+        /**
+         * 调用接口获取登录凭证（code）
+         * @platform 基础库通用
+         * @description 1. code 有效期5分钟，需在服务端调用 code2Session 换取 openid/session_key；2. 用户数据加解密依赖 session_key；3. 登录态失效后需重新调用此接口
+         * @param options 接口配置
+         * @example
+         * bl.login({
+         *   success(res) {
+         *     if (res.code) {
+         *       // 发起网络请求
+         *       bl.request({
+         *         url: 'https://test.com/onLogin',
+         *         data: {
+         *           code: res.code
+         *         }
+         *       })
+         *     } else {
+         *       console.log('登录失败！' + res.errMsg)
+         *     }
+         *   }
+         */
+        login: (options?: LoginOptions) => void;
+
+        //#endregion 登录
+
+        //#region 授权
+
+        /**
+         * 提前向用户发起授权请求
+         * @platform 基础库通用
+         * @description 1. 未授权时弹窗询问，已授权则直接返回成功；2. 仅发起授权请求，不实际调用对应功能接口；3. 建议先通过 bl.getSetting 查询授权状态
+         * @param options 授权配置（必填 scope）
+         * @example
+         * // 可以通过 bl.getSetting 先查询一下用户是否授权了 "scope.record" 这个 scope
+         * bl.getSetting({
+         *   success(res) {
+         *     if (!res.authSetting['scope.record']) {
+         *       bl.authorize({
+         *         scope: 'scope.record',
+         *         success() {
+         *           // 用户已经同意小游戏使用录音功能，后续调用 bl.startRecord 接口不会弹窗询问
+         *           bl.startRecord()
+         *         }
+         *       })
+         *     }
+         *   }
+         * })
+         */
+        authorize: (options: AuthorizeOptions) => void;
+
+        //#endregion 授权
+
+        //#region 设置
+
+        /**
+         * 调起客户端小游戏设置界面
+         * @platform 基础库通用
+         * @description 设置界面仅显示小游戏已向用户请求过的权限，返回用户设置操作结果
+         * @param options 接口配置
+         * @example
+         * bl.openSetting({
+         *   success(res) {
+         *     console.log(res.authSetting)
+         *     // res.authSetting = {
+         *     //   "scope.userInfo": true,
+         *     //   "scope.userLocation": true
+         *     // }
+         *   }
+         * })
+         */
+        openSetting: (options?: OpenSettingOptions) => void;
+
+        /**
+         * 获取用户的当前设置
+         * @platform 基础库通用
+         * @description 返回值仅包含小游戏已向用户请求过的权限
+         * @param options 接口配置
+         * @example
+         * bl.openSetting({
+         *   success(res) {
+         *     console.log(res.authSetting)
+         *     // res.authSetting = {
+         *     //   "scope.userInfo": true,
+         *     //   "scope.userLocation": true
+         *     // }
+         *   }
+         * })
+         */
+        getSetting: (options?: GetSettingOptions) => void;
+
+        /**
+         * 创建打开设置页面的按钮
+         * @platform 基础库 2.3.0+（低版本需做兼容处理）
+         * @param options 按钮配置
+         * @returns 打开设置页面按钮实例
+         * @example
+         * const button = bl.createOpenSettingButton({
+         *     type: 'text',
+         *     text: '打开设置页面',
+         *     style: {
+         *         left: 0,
+         *         top: 0,
+         *         width: 200,
+         *         height: 40,
+         *         color: '#0000ff',
+         *         backgroundColor: '#ff0000',
+         *         borderColor: '#000000',
+         *         borderWidth: 1,
+         *         borderRadius: 4,
+         *         textAlign: 'center',
+         *         fontSize: 16,
+         *         lineHeight: 40,
+         *     },
+         * });
+         * button.onTap(res => {
+         *     console.log(res);
+         * });
+         */
+        createOpenSettingButton: (
+            options: CreateOpenSettingButtonOptions
+        ) => OpenSettingButton;
+
+        //#endregion 设置
+
+        //#endregion 开放接口
     }
 }
