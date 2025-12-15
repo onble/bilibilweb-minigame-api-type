@@ -1732,25 +1732,207 @@ declare namespace BilibilWebMinigame {
 
         //#region 震动
 
+        /**
+         * 使手机发生较长时间的振动（400ms）
+         * @platform 基础库通用
+         * @param options 振动配置
+         */
+        vibrateLong: (options?: VibrateLongOptions) => void;
+
+        /**
+         * 使手机发生较短时间的振动（15ms）
+         * @platform 基础库通用（仅 iPhone 7/7 Plus 以上及 Android 机型生效）
+         * @param options 振动配置
+         */
+        vibrateShort: (options?: VibrateShortOptions) => void;
+
         //#endregion 震动
 
         //#region 性能
+
+        /**
+         * 监听内存不足告警事件
+         * @platform 基础库 2.4.0+
+         * @description iOS/Android 均触发回调，但 level 字段仅 Android 有效；收到告警后建议回收不必要资源
+         * @param callback 内存告警回调函数
+         * @example
+         * bl.onMemoryWarning(function() {
+         *     console.log('onMemoryWarningReceive');
+         * })``;
+         */
+        onMemoryWarning: (callback: MemoryWarningCallback) => void;
 
         //#endregion 性能
 
         //#region 屏幕
 
+        /**
+         * 设置屏幕亮度
+         * @platform 基础库通用
+         * @param options 亮度配置（必填 value 字段，范围 0~1）
+         */
+        setScreenBrightness: (options: SetScreenBrightnessOptions) => void;
+
+        /**
+         * 设置屏幕常亮状态
+         * @platform 基础库通用
+         * @description 仅当前小游戏生效，离开小游戏后设置失效
+         * @param options 常亮配置（必填 keepScreenOn 字段）
+         * @example
+         * bl.setKeepScreenOn({
+         *   keepScreenOn: true
+         * })
+         */
+        setKeepScreenOn: (options: SetKeepScreenOnOptions) => void;
+
+        /**
+         * 获取屏幕亮度
+         * @platform 基础库通用
+         * @description Android 自动亮度模式下仅返回调节前的值，非实时亮度值
+         * @param options 亮度获取配置
+         */
+        getScreenBrightness: (options?: GetScreenBrightnessOptions) => void;
+
+        /**
+         * 监听用户主动截屏事件
+         * @platform 基础库 3.22.0+
+         * @description 用户使用系统截屏按键时触发，仅能注册一个监听
+         * @param callback 截屏事件回调
+         * @example
+         * bl.onUserCaptureScreen(function (res) {
+         *   console.log('用户截屏了')
+         * })
+         */
+        onUserCaptureScreen: (callback: UserCaptureScreenCallback) => void;
+
+        /**
+         * 显示/隐藏顶部状态栏
+         * @platform 基础库 3.37.0+
+         * @param options 状态栏配置（必填 hidden 字段）
+         * @example
+         * bl.setStatusBarHidden({
+         *     hidden: true,
+         * });
+         */
+        setStatusBarHidden: (options: SetStatusBarHiddenOptions) => void;
+
         //#endregion 屏幕
 
         //#region 加速计
+
+        /**
+         * 开始监听加速度数据
+         * @platform 基础库通用
+         * @description 调用后会自动开始监听，频率由 interval 参数控制
+         * @param options 监听配置（含回调频率）
+         * @example
+         * bl.startAccelerometer({ interval: 'game' })
+         */
+        startAccelerometer: (options?: StartAccelerometerOptions) => void;
+
+        /**
+         * 停止监听加速度数据
+         * @platform 基础库通用
+         * @param options 停止监听配置
+         * @example
+         * bl.stopAccelerometer()
+         */
+        stopAccelerometer: (options?: StopAccelerometerOptions) => void;
+
+        /**
+         * 监听加速度数据事件
+         * @platform 基础库通用
+         * @description 频率由 startAccelerometer 的 interval 参数决定
+         * @param callback 加速度数据回调函数
+         * @example
+         * bl.onAccelerometerChange(callback)
+         */
+        onAccelerometerChange: (callback: AccelerometerChangeCallback) => void;
+
+        /**
+         * 取消监听加速度数据事件
+         * @platform 基础库通用
+         * @param callback 要取消的回调（不传则取消所有）
+         */
+        offAccelerometerChange: (callback?: AccelerometerChangeCallback) => void;
 
         //#endregion 加速计
 
         //#region 罗盘
 
+        /**
+         * 开始监听罗盘数据
+         * @platform 基础库通用
+         * @description 调用后自动开始监听，频率固定为 5 次/秒
+         * @param options 监听配置
+         * @example
+         * bl.startCompass()
+         */
+        startCompass: (options?: StartCompassOptions) => void;
+
+        /**
+         * 停止监听罗盘数据
+         * @platform 基础库通用
+         * @param options 停止监听配置
+         * @example
+         * bl.stopCompass()
+         */
+        stopCompass: (options?: StopCompassOptions) => void;
+
+        /**
+         * 监听罗盘数据变化事件
+         * @platform 基础库通用
+         * @description 频率固定为 5 次/秒，调用后自动开始监听
+         * @param callback 罗盘数据回调函数
+         * @example
+         * bl.onCompassChange(callback)
+         */
+        onCompassChange: (callback: CompassChangeCallback) => void;
+
+        /**
+         * 取消监听罗盘数据变化事件
+         * @platform 基础库通用
+         * @param callback 要取消的回调（不传则取消所有）
+         */
+        offCompassChange: (callback?: CompassChangeCallback) => void;
+
         //#endregion 罗盘
 
         //#region 陀螺仪
+
+        /**
+         * 开始监听陀螺仪数据
+         * @platform 基础库通用
+         * @description 回调频率由 interval 参数控制（game:20ms/次、ui:60ms/次、normal:200ms/次）
+         * @param options 监听配置（含回调频率）
+         */
+        startGyroscope: (options?: StartGyroscopeOptions) => void;
+
+        /**
+         * 停止监听陀螺仪数据
+         * @platform 基础库通用
+         * @param options 停止监听配置
+         * @example
+         * bl.stopGyroscope()
+         */
+        stopGyroscope: (options?: StopGyroscopeOptions) => void;
+
+        /**
+         * 监听陀螺仪数据变化事件
+         * @platform 基础库通用
+         * @description 频率由 startGyroscope 的 interval 参数决定
+         * @param callback 陀螺仪数据回调函数
+         * @example
+         * bl.onGyroscopeChange(callback)
+         */
+        onGyroscopeChange: (callback: GyroscopeChangeCallback) => void;
+
+        /**
+         * 取消监听陀螺仪数据变化事件
+         * @platform 基础库通用
+         * @param callback 要取消的回调（不传则取消所有）
+         */
+        offGyroscopeChange: (callback?: GyroscopeChangeCallback) => void;
 
         //#endregion 陀螺仪
 
