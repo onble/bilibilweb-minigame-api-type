@@ -2915,5 +2915,76 @@ declare namespace BilibilWebMinigame {
         //#endregion 添加到桌面
 
         //#endregion 开放接口
+
+        //#region 第三方服务
+
+        //#region 声网(Agora)
+
+        /**
+         * 加载 Agora 声网服务（必须先调用确保 SDK 载入）
+         * @platform 基础库 3.10.0+
+         * @param options 加载配置
+         * @example
+         * let channelId = ''; // 用于临时存储当前已加入的房间
+         * 必须先确保 Agora 模块已载入
+         * 
+         * let agoraSDKLoaded = false;
+         * 
+         * function loadAgoraSDK() {
+         *     return new Promise((resolve, reject) => {
+         *         if (agoraSDKLoaded) {
+         *             resolve();
+         *             return;
+         *         }
+         *         bl.loadAgora({
+         *             success() {
+         *                 agoraSDKLoaded = true;
+         *                 resolve();
+         *             },
+         *             fail: reject
+         *         });
+         *     });
+         * }
+         * 
+         * // 调用 Agora 能力前必须先授权录音权限
+         * function authorizeRecord() {
+         *     return new Promise((resolve, reject) => {
+         *         bl.authorize({
+         *             scope: 'scope.record',
+         *             success: resolve,
+         *             fail: reject
+         *         });
+         *     });
+         * }
+         * 
+         * // 每次打开时需要恢复声网 SDK：
+         * bl.onShow(() => {
+         *     // 在这里恢复引擎、以及加入过的房间
+         *     loadAgoraSDK()
+         *         .then(authorizeRecord)
+         *         .then(() => {
+         *             agora.init('<Agora AppId>');
+         *             if (channelId.length > 0) {
+         *                 agora.on('join-channel-success', () => {
+         *                     // 加入成功逻辑处理
+         *                 });
+         *                 agora.joinChannel('', channelId, '', '<用户 ID>');
+         *             }
+         *         })
+         *         .catch(err => {
+         *             // 处理异常
+         *         });
+         * });
+         * 
+         * // 每次离开时记录当前的房间，以备下次打开时重新进入：
+         * bl.onHide(() => {
+         *     channelId = '<当前房间 ID>';
+         * });
+         */
+        loadAgora: (options: LoadAgoraOptions) => void;
+
+        //#endregion 声网(Agora)
+
+        //#endregion 第三方服务
     }
 }

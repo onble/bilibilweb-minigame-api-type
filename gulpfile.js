@@ -20,7 +20,7 @@ gulp.task('build-types', (cb) => {
         }))
         .pipe(concat(`${outputFileName}.d.ts`))
         .pipe(insert.prepend('/** bilbiliweb的变量命名空间 */\ndeclare namespace BilibilWebMinigame {\n'))
-        .pipe(insert.append('\n}\n\n/** 将bilbiliweb的bl变量声明为全局变量 */\ndeclare const bl: BilibilWebMinigame.BL;'))
+        .pipe(insert.append('\n}\n\n/** 将bilbiliweb的bl变量声明为全局变量 */\ndeclare const bl: BilibilWebMinigame.BL;\n\n\n/** 声网的全局变量-未接入的话请忽视 */\ndeclare const agora: BilibilWebMinigame.Agora;'))
         .pipe(gulp.dest('dist/'));
 
     mergeStream.on('end', () => {
