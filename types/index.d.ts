@@ -2986,5 +2986,76 @@ declare namespace BilibilWebMinigame {
         //#endregion 声网(Agora)
 
         //#endregion 第三方服务
+
+        //#region 游戏对局回放
+
+        /**
+         * 获取全局唯一的游戏画面录制对象
+         * @platform 基础库 3.7.0+（低版本需兼容）
+         * @returns 游戏录制对象
+         */
+        getGameRecorder: () => GameRecorder;
+
+        /**
+         * 创建游戏对局回放分享按钮（单例）
+         * @platform 基础库 3.7.0+（低版本需兼容）
+         * @param options 按钮配置（share为必填）
+         * @returns 分享按钮对象
+         */
+        createGameRecorderShareButton: (
+            options: CreateGameRecorderShareButtonOptions
+        ) => GameRecorderShareButton;
+
+        //#endregion 游戏对局回放
+
+        //#region 广告
+
+        /**
+         * 创建激励视频广告组件（单例模式）
+         * @platform 基础库 4.0.0+（低版本需兼容）
+         * @description 1. 小游戏端全局单例，小程序端页面内单例；2. 需先通过 bl.getSystemInfoSync().SDKVersion 判断版本；3. 多例模式需显式设置 multiton=true
+         * @param options 创建参数（adUnitId 为必填）
+         * @returns 激励视频广告组件实例
+         */
+        createRewardedVideoAd: (
+            options: CreateRewardedVideoAdOptions
+        ) => RewardedVideoAd;
+
+        //#endregion 广告
+
+        //#region 客服能力
+
+        /**
+         * 打开小游戏客服会话（仅 iOS 支持）
+         * @platform 基础库 4.0.2+（低版本需兼容）、仅 iOS 支持
+         * @description 1. 需在用户至少一次 touch 事件后调用；2. 支持 Promise 风格调用；3. sessionFrom 最长1000字符，超过自动截断
+         * @param options 调用参数
+         * @returns Promise 结果（成功/失败对应不同返回结构）
+         * @example
+         * // 回调风格
+         * bl.openCustomerServiceConversation({
+         *   sessionFrom: "",
+         *   success(res) {
+         *     console.log(res);
+         *   },
+         *   fail(res) {
+         *     console.log(res);
+         *   },
+         * });
+             * 
+         * // Promise风格
+         * bl.openCustomerServiceConversation({
+         *   sessionFrom: "",
+         * }).then(res => {
+         *   console.log(res);
+         * }).catch(err => {
+         *   console.log(res);
+         * });
+         */
+        openCustomerServiceConversation: (
+            options: OpenCustomerServiceConversationOptions
+        ) => Promise<OpenCustomerServiceConversationSuccessRes>;
+
+        //#endregion 客服能力
     }
 }

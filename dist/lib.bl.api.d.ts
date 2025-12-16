@@ -2977,12 +2977,181 @@ declare namespace BilibilWebMinigame {
          * 加载 Agora 声网服务（必须先调用确保 SDK 载入）
          * @platform 基础库 3.10.0+
          * @param options 加载配置
+         * @example
+         * let channelId = ''; // 用于临时存储当前已加入的房间
+         * 必须先确保 Agora 模块已载入
+         *
+         * let agoraSDKLoaded = false;
+         *
+         * function loadAgoraSDK() {
+         *     return new Promise((resolve, reject) => {
+         *         if (agoraSDKLoaded) {
+         *             resolve();
+         *             return;
+         *         }
+         *         bl.loadAgora({
+         *             success() {
+         *                 agoraSDKLoaded = true;
+         *                 resolve();
+         *             },
+         *             fail: reject
+         *         });
+         *     });
+         * }
+         *
+         * // 调用 Agora 能力前必须先授权录音权限
+         * function authorizeRecord() {
+         *     return new Promise((resolve, reject) => {
+         *         bl.authorize({
+         *             scope: 'scope.record',
+         *             success: resolve,
+         *             fail: reject
+         *         });
+         *     });
+         * }
+         *
+         * // 每次打开时需要恢复声网 SDK：
+         * bl.onShow(() => {
+         *     // 在这里恢复引擎、以及加入过的房间
+         *     loadAgoraSDK()
+         *         .then(authorizeRecord)
+         *         .then(() => {
+         *             agora.init('<Agora AppId>');
+         *             if (channelId.length > 0) {
+         *                 agora.on('join-channel-success', () => {
+         *                     // 加入成功逻辑处理
+         *                 });
+         *                 agora.joinChannel('', channelId, '', '<用户 ID>');
+         *             }
+         *         })
+         *         .catch(err => {
+         *             // 处理异常
+         *         });
+         * });
+         *
+         * // 每次离开时记录当前的房间，以备下次打开时重新进入：
+         * bl.onHide(() => {
+         *     channelId = '<当前房间 ID>';
+         * });
          */
         loadAgora: (options: LoadAgoraOptions) => void;
 
         //#endregion 声网(Agora)
 
         //#endregion 第三方服务
+
+        //#region 游戏对局回放
+
+        /**
+         * 获取全局唯一的游戏画面录制对象
+         * @platform 基础库 3.7.0+（低版本需兼容）
+         * @returns 游戏录制对象
+         */
+        getGameRecorder: () => GameRecorder;
+
+        /**
+         * 创建游戏对局回放分享按钮（单例）
+         * @platform 基础库 3.7.0+（低版本需兼容）
+         * @param options 按钮配置（share为必填）
+         * @returns 分享按钮对象
+         */
+        createGameRecorderShareButton: (
+            options: CreateGameRecorderShareButtonOptions,
+        ) => GameRecorderShareButton;
+
+        //#endregion 游戏对局回放
+
+        //#region 广告
+
+        /**
+         * 创建激励视频广告组件（单例模式）
+         * @platform 基础库 4.0.0+（低版本需兼容）
+         * @description 1. 小游戏端全局单例，小程序端页面内单例；2. 需先通过 bl.getSystemInfoSync().SDKVersion 判断版本；3. 多例模式需显式设置 multiton=true
+         * @param options 创建参数（adUnitId 为必填）
+         * @returns 激励视频广告组件实例
+         */
+        createRewardedVideoAd: (
+            options: CreateRewardedVideoAdOptions,
+        ) => RewardedVideoAd;
+
+        //#endregion 广告
+
+        //#region 客服能力
+
+        /**
+         * 打开小游戏客服会话（仅 iOS 支持）
+         * @platform 基础库 4.0.2+（低版本需兼容）、仅 iOS 支持
+         * @description 1. 需在用户至少一次 touch 事件后调用；2. 支持 Promise 风格调用；3. sessionFrom 最长1000字符，超过自动截断
+         * @param options 调用参数
+         * @returns Promise 结果（成功/失败对应不同返回结构）
+         * @example
+         * // 回调风格
+         * bl.openCustomerServiceConversation({
+         *   sessionFrom: "",
+         *   success(res) {
+         *     console.log(res);
+         *   },
+         *   fail(res) {
+         *     console.log(res);
+         *   },
+         * });
+         *
+         * // Promise风格
+         * bl.openCustomerServiceConversation({
+         *   sessionFrom: "",
+         * }).then(res => {
+         *   console.log(res);
+         * }).catch(err => {
+         *   console.log(res);
+         * });
+         */
+        openCustomerServiceConversation: (
+            options: OpenCustomerServiceConversationOptions,
+        ) => Promise<OpenCustomerServiceConversationSuccessRes>;
+
+        //#endregion 客服能力
+    }
+    // ------------------------------ 接口参数类型 ------------------------------
+    /**
+     * 打开客服会话接口参数
+     * @platform 基础库 4.0.2+、仅 iOS 支持
+     * @description 1. 需在用户至少一次 touch 事件后调用；2. sessionFrom 最长1000字符，超过截断
+     */
+    interface OpenCustomerServiceConversationOptions {
+        /**
+         * 会话来源（透传至客服链接的 session_from query 字段）
+         * @default ''
+         * @maxLength 1000（超过自动截断）
+         */
+        sessionFrom?: string;
+        /** 接口调用成功回调 */
+        success?: (res: OpenCustomerServiceConversationSuccessRes) => void;
+        /** 接口调用失败回调 */
+        fail?: (res: OpenCustomerServiceConversationFailRes) => void;
+        /** 接口调用结束回调（成功/失败均执行） */
+        complete?: (
+            res:
+                | OpenCustomerServiceConversationSuccessRes
+                | OpenCustomerServiceConversationFailRes,
+        ) => void;
+    }
+
+    /**
+     * 打开客服会话成功返回结果
+     * @platform 基础库 4.0.2+、仅 iOS 支持
+     */
+    interface OpenCustomerServiceConversationSuccessRes {
+        /** 成功提示信息（固定值） */
+        errMsg: "openCustomerServiceConversation:ok";
+    }
+
+    /**
+     * 打开客服会话失败返回结果
+     * @platform 基础库 4.0.2+、仅 iOS 支持
+     */
+    interface OpenCustomerServiceConversationFailRes {
+        /** 错误提示信息（格式：openCustomerServiceConversation:fail + 详细信息） */
+        errMsg: string;
     }
     /**
      * reportScene 接口成功回调参数类型
@@ -3624,6 +3793,352 @@ declare namespace BilibilWebMinigame {
             encoding?: FileEncoding,
         ) => void;
     }
+    // ------------------------------ 核心枚举/常量 ------------------------------
+    /**
+     * 游戏录制错误码枚举
+     * @platform 基础库 3.7.0+
+     */
+    enum GameRecorderErrorCode {
+        /** 未知错误 */
+        UnknownError = 1,
+        /** SDK 内部错误 */
+        InternalFailed = 2,
+        /** 当前设备不支持录制 */
+        NotSupported = 3,
+        /** duration 参数不合法 */
+        StartDurationInvalid = 4,
+        /** bitrate 参数不合法 */
+        StartBitRateInvalid = 5,
+        /** fps 参数不合法 */
+        StartFPSInvalid = 6,
+        /** gop 参数不合法 */
+        StartGOPInvalid = 7,
+        /** 已开始录制时调用 start */
+        StartWhileAlreadyStartRecording = 8,
+        /** 暂停状态调用 start（应调用 resume） */
+        StartWhilePaused = 9,
+        /** 未开始录制时调用 pause */
+        PauseWhileNotStartRecording = 10,
+        /** 已暂停时调用 pause */
+        PauseWhileAlreadyPaused = 11,
+        /** 未开始录制时调用 resume */
+        ResumeWhileNotStartRecording = 12,
+        /** 录制中调用 resume（仅暂停状态可调用） */
+        ResumeWhileRecording = 13,
+        /** 未开始录制时调用 abort */
+        AbortWhileNotStartRecording = 14,
+        /** 未开始录制时调用 stop */
+        StopWhileNotStartRecording = 15,
+        /** 无录制视频时发起分享 */
+        NoVideo = 16,
+        /** 背景音乐不存在 */
+        BGMNotFound = 17,
+        /** 剪辑区间不合法 */
+        TimeRangeInvalid = 18,
+        /** 剪辑总时长超出上限 */
+        EditDurationOutOfLimit = 19,
+        /** 剪辑区间太短（需>2秒） */
+        TimeRangeTooShort = 20,
+    }
+
+    /**
+     * 录制事件类型枚举
+     * @platform 基础库 3.7.0+
+     */
+    enum GameRecorderEvent {
+        /** 录制开始事件 */
+        START = "start",
+        /** 录制结束事件 */
+        STOP = "stop",
+        /** 录制暂停事件 */
+        PAUSE = "pause",
+        /** 录制恢复事件 */
+        RESUME = "resume",
+        /** 录制取消事件 */
+        ABORT = "abort",
+        /** 录制时间更新事件 */
+        TIME_UPDATE = "timeUpdate",
+        /** 错误事件 */
+        ERROR = "error",
+    }
+
+    /**
+     * 分享按钮类型枚举
+     * @platform 基础库 3.7.0+
+     */
+    enum GameRecorderShareButtonType {
+        /** 文本按钮（可设置背景色/文本） */
+        TEXT = "text",
+        /** 图片按钮（仅背景贴图） */
+        IMAGE = "image",
+    }
+
+    /**
+     * 文本对齐方式枚举
+     * @platform 基础库 3.7.0+
+     */
+    enum TextAlignType {
+        /** 居左 */
+        LEFT = "left",
+        /** 居中 */
+        CENTER = "center",
+        /** 居右 */
+        RIGHT = "right",
+    }
+
+    /**
+     * 视频播放速率合法值（固定枚举）
+     * @platform 基础库 3.19.0+
+     */
+    type AgoraTempoValue = 0.3 | 0.5 | 1 | 1.5 | 2 | 2.5 | 3;
+
+    // ------------------------------ 事件回调参数类型 ------------------------------
+    /**
+     * timeUpdate 事件参数
+     * @platform 基础库 3.7.0+
+     */
+    interface GameRecorderTimeUpdateRes {
+        /** 当前视频录制到第几秒 */
+        currentTime: number;
+    }
+
+    /**
+     * error 事件参数
+     * @platform 基础库 3.7.0+
+     */
+    interface GameRecorderErrorRes {
+        /** 错误码（对应 GameRecorderErrorCode） */
+        code: GameRecorderErrorCode | number;
+        /** 错误信息 */
+        message: string;
+    }
+
+    /**
+     * stop 事件参数
+     * @platform 基础库 3.7.0+
+     */
+    interface GameRecorderStopRes {
+        /** 视频时长（毫秒） */
+        duration: number;
+    }
+
+    /**
+     * 录制事件参数映射
+     * @platform 基础库 3.7.0+
+     */
+    interface GameRecorderEventParams {
+        [GameRecorderEvent.START]: [];
+        [GameRecorderEvent.STOP]: [res: GameRecorderStopRes];
+        [GameRecorderEvent.PAUSE]: [];
+        [GameRecorderEvent.RESUME]: [];
+        [GameRecorderEvent.ABORT]: [];
+        [GameRecorderEvent.TIME_UPDATE]: [res: GameRecorderTimeUpdateRes];
+        [GameRecorderEvent.ERROR]: [res: GameRecorderErrorRes];
+    }
+
+    // ------------------------------ 录制参数类型 ------------------------------
+    /**
+     * GameRecorder.start 接口参数
+     * @platform 基础库 3.7.0+
+     */
+    interface GameRecorderStartOptions {
+        /** 视频帧率（默认24） */
+        fps?: number;
+        /** 时长限制（秒），5 ≤ duration ≤ 7200，默认7200 */
+        duration?: number;
+        /** 视频比特率（kbps），600 ≤ bitrate ≤ 3000，默认1000 */
+        bitrate?: number;
+        /** 关键帧间隔（默认12） */
+        gop?: number;
+        /** 是否录制游戏音效（3.10.0+，默认true） */
+        hookBgm?: boolean;
+    }
+
+    // ------------------------------ 分享按钮相关类型 ------------------------------
+    /**
+     * 分享按钮样式配置
+     * @platform 基础库 3.7.0+
+     */
+    interface GameRecorderShareButtonStyle {
+        /** 左上角横坐标（逻辑像素，默认0） */
+        left?: number;
+        /** 左上角纵坐标（逻辑像素，默认0） */
+        top?: number;
+        /** 按钮高度（逻辑像素，最小40，默认40） */
+        height?: number;
+        /** 文本颜色（默认#ffffff） */
+        color?: string;
+        /** 背景颜色（hex，默认透明） */
+        backgroundColor?: string;
+        /** 边框颜色（hex，默认透明） */
+        borderColor?: string;
+        /** 边框宽度（默认0） */
+        borderWidth?: number;
+        /** 边框圆角（默认0） */
+        borderRadius?: number;
+        /** 文本水平对齐方式（默认left） */
+        textAlign?: TextAlignType;
+        /** 字号（默认14） */
+        fontSize?: number;
+        /** 文本行高 */
+        lineHeight?: number;
+        /** 宽度（补充字段，文档属性中存在） */
+        width?: number;
+    }
+
+    /**
+     * 对局回放分享参数
+     * @platform 基础库 3.7.0+（timeRange/bgm等 3.19.0+）
+     */
+    interface GameRecorderShareOptions {
+        /** 分享后跳转小游戏的query参数 */
+        query?: string;
+        /** 剪辑区间（二维数组，单位ms，总时长≤60秒，单段>2秒） */
+        timeRange?: [number, number][];
+        /** 背景音乐地址（仅代码包/blfile路径，不支持http/https） */
+        bgm?: string;
+        /** 音量（0~1，默认1） */
+        volume?: number;
+        /** 播放速率（固定值：0.3/0.5/1/1.5/2/2.5/3，默认1） */
+        atempo?: AgoraTempoValue;
+        /** 是否混音（原始音频+BGM，默认false） */
+        audioMix?: boolean;
+    }
+
+    /**
+     * 创建分享按钮参数
+     * @platform 基础库 3.7.0+
+     */
+    interface CreateGameRecorderShareButtonOptions {
+        /** 按钮类型（默认text） */
+        type?: GameRecorderShareButtonType;
+        /** 按钮文本（仅type=text有效，默认"分享回放"） */
+        text?: string;
+        /** 背景图片（仅type=image有效，默认空） */
+        image?: string;
+        /** 按钮样式 */
+        style?: GameRecorderShareButtonStyle;
+        /** 分享参数（必填） */
+        share: GameRecorderShareOptions;
+    }
+
+    // ------------------------------ GameRecorder 核心接口 ------------------------------
+    /**
+     * 游戏画面录制对象（全局唯一）
+     * @platform 基础库 3.7.0+
+     */
+    interface GameRecorder {
+        /**
+         * 获取是否支持录制游戏画面
+         * @returns 是否支持
+         */
+        isFrameSupported: () => boolean;
+
+        /**
+         * 获取是否支持录制游戏音频
+         * @returns 是否支持
+         */
+        isSoundSupported: () => boolean;
+
+        /**
+         * 获取是否支持调节录制视频音量
+         * @returns 是否支持
+         */
+        isVolumeSupported: () => boolean;
+
+        /**
+         * 获取是否支持调节录制视频播放速率
+         * @returns 是否支持
+         */
+        isAtempoSupported: () => boolean;
+
+        /**
+         * 开始录制游戏画面
+         * @param options 录制参数
+         * @returns 是否启动成功（boolean）
+         */
+        start: (options?: GameRecorderStartOptions) => boolean;
+
+        /**
+         * 结束录制游戏画面（可发起分享）
+         * @returns 结束录制的Promise
+         */
+        stop: () => Promise<void>;
+
+        /**
+         * 暂停录制游戏画面
+         * @returns 暂停录制的Promise
+         */
+        pause: () => Promise<void>;
+
+        /**
+         * 恢复录制游戏画面
+         * @returns 恢复录制的Promise
+         */
+        resume: () => Promise<void>;
+
+        /**
+         * 放弃录制（丢弃已录制内容）
+         * @returns 中断录制的Promise
+         */
+        abort: () => Promise<void>;
+
+        /**
+         * 注册录制事件监听
+         * @param event 事件名
+         * @param callback 回调函数
+         */
+        on: <E extends GameRecorderEvent>(
+            event: E,
+            callback: (...args: GameRecorderEventParams[E]) => void,
+        ) => void;
+
+        /**
+         * 取消录制事件监听
+         * @param event 事件名
+         * @param callback 要取消的回调
+         */
+        off: <E extends GameRecorderEvent>(
+            event: E,
+            callback: (...args: GameRecorderEventParams[E]) => void,
+        ) => void;
+    }
+
+    // ------------------------------ GameRecorderShareButton 接口 ------------------------------
+    /**
+     * 游戏对局回放分享按钮对象
+     * @platform 基础库 3.7.0+
+     */
+    interface GameRecorderShareButton {
+        /** 按钮类型 */
+        type: GameRecorderShareButtonType;
+        /** 按钮文本（仅type=text有效） */
+        text: string;
+        /** 背景图片（仅type=image有效） */
+        image: string;
+        /** 按钮样式 */
+        style: GameRecorderShareButtonStyle;
+        /** 分享参数 */
+        share: GameRecorderShareOptions;
+
+        /** 显示分享按钮 */
+        show: () => void;
+
+        /** 隐藏分享按钮 */
+        hide: () => void;
+
+        /**
+         * 监听按钮点击事件（仅分享失败时触发）
+         * @param callback 点击回调（分享失败时执行）
+         */
+        onTap: (callback: () => void) => void;
+
+        /**
+         * 取消监听按钮点击事件
+         * @param callback 要取消的回调
+         */
+        offTap: (callback: () => void) => void;
+    }
     /**
      * getLocation 接口成功回调返回值类型
      * @description 地理位置信息（纬度/经度）
@@ -3708,6 +4223,137 @@ declare namespace BilibilWebMinigame {
         PREDEV = "predev",
         /** 审核预览版本（提交审核的版本） */
         PRECHECK = "precheck",
+    }
+    // ------------------------------ 核心枚举/常量 ------------------------------
+    /**
+     * 激励视频广告错误码枚举
+     * @platform 基础库 4.0.0+
+     */
+    enum RewardedVideoAdErrCode {
+        /** 后端接口调用失败 */
+        BACKEND_API_FAILED = 1000,
+        /** 参数错误 */
+        PARAM_ERROR = 1001,
+        /** 广告单元无效 */
+        AD_UNIT_INVALID = 1002,
+        /** 内部错误 */
+        INTERNAL_ERROR = 1003,
+        /** 无合适的广告 */
+        NO_SUITABLE_AD = 1004,
+        /** 广告组件审核中 */
+        AD_COMPONENT_REVIEWING = 1005,
+        /** 广告组件被驳回 */
+        AD_COMPONENT_REJECTED = 1006,
+        /** 广告组件被封禁 */
+        AD_COMPONENT_BANNED = 1007,
+        /** 广告单元已关闭 */
+        AD_UNIT_CLOSED = 1008,
+    }
+
+    /**
+     * 激励视频广告错误码与说明/解决方案映射
+     * @platform 基础库 4.0.0+
+     */
+    interface RewardedVideoAdErrDetail {
+        /** 异常情况描述 */
+        reason: string;
+        /** 解决方案 */
+        solution: string;
+    }
+
+    // ------------------------------ 事件回调参数类型 ------------------------------
+    /**
+     * 激励视频广告错误事件参数
+     * @platform 基础库 4.0.0+
+     */
+    interface RewardedVideoAdErrorRes {
+        /** 错误信息 */
+        errMsg: string;
+        /** 错误码（对应 RewardedVideoAdErrCode） */
+        errCode: RewardedVideoAdErrCode | number;
+    }
+
+    /**
+     * 激励视频广告关闭事件参数
+     * @platform 基础库 4.0.0+
+     */
+    interface RewardedVideoAdCloseRes {
+        /** 视频是否被完整观看后关闭 */
+        isEnded: boolean;
+    }
+
+    // ------------------------------ 创建广告参数类型 ------------------------------
+    /**
+     * 创建激励视频广告组件参数
+     * @platform 基础库 4.0.0+
+     */
+    interface CreateRewardedVideoAdOptions {
+        /** 广告单元 ID（必填） */
+        adUnitId: string;
+        /** 是否启用多例模式（默认 false） */
+        multiton?: boolean;
+    }
+
+    // ------------------------------ 激励视频广告组件接口 ------------------------------
+    /**
+     * 激励视频广告组件（全局单例，小程序端为页面内单例）
+     * @platform 基础库 4.0.0+（低版本需兼容）
+     * @description 1. 原生组件，层级高于普通组件；2. 默认隐藏，需调用 show() 显示；3. 小游戏端全局单例，小程序端页面内单例且不允许跨页面使用
+     */
+    interface RewardedVideoAd {
+        /**
+         * 加载激励视频广告
+         * @returns 加载结果 Promise（无返回值，失败会 reject）
+         */
+        load: () => Promise<void>;
+
+        /**
+         * 显示激励视频广告（从屏幕下方推入）
+         * @returns 显示操作结果 Promise（无返回值，失败会 reject）
+         */
+        show: () => Promise<void>;
+
+        /**
+         * 销毁激励视频广告实例
+         * @returns 销毁操作结果 Promise（无返回值）
+         */
+        destroy: () => Promise<void>;
+
+        /**
+         * 监听广告加载成功事件
+         * @param listener 加载成功监听函数（无参数）
+         */
+        onLoad: (listener: () => void) => void;
+
+        /**
+         * 移除广告加载成功事件监听
+         * @param listener 要移除的监听函数（不传则移除所有）
+         */
+        offLoad: (listener?: () => void) => void;
+
+        /**
+         * 监听广告错误事件
+         * @param listener 错误事件监听函数（参数为错误信息）
+         */
+        onError: (listener: (res: RewardedVideoAdErrorRes) => void) => void;
+
+        /**
+         * 移除广告错误事件监听
+         * @param listener 要移除的监听函数（不传则移除所有）
+         */
+        offError: (listener?: (res: RewardedVideoAdErrorRes) => void) => void;
+
+        /**
+         * 监听广告关闭事件
+         * @param listener 关闭事件监听函数（参数包含是否完整观看）
+         */
+        onClose: (listener: (res: RewardedVideoAdCloseRes) => void) => void;
+
+        /**
+         * 移除广告关闭事件监听
+         * @param listener 要移除的监听函数（不传则移除所有）
+         */
+        offClose: (listener?: (res: RewardedVideoAdCloseRes) => void) => void;
     }
     /**
      * showShareMenu 接口调用参数类型
@@ -9235,12 +9881,14 @@ declare namespace BilibilWebMinigame {
          * @param uid 用户ID
          * @param mute true=停止接收播放，false=允许
          */
-        muteRemoteAudioStream: (uid: string | number, mute: boolean) => void;
+        muteRemoteAudioStream: (uid: string, mute: boolean) => void;
 
         /**
          * 启用说话者音量提示
          * @param interval 提示间隔（>0 毫秒，最小10ms，建议>200ms）
          * @param smooth 平滑系数（0-10，建议3）
+         * @example
+         * agora.enableAudioVolumeIndication(1000, 3)
          */
         enableAudioVolumeIndication: (interval: number, smooth: number) => void;
 
