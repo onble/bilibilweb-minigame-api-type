@@ -41,4 +41,19 @@ declare namespace BilibilWebMinigame {
         ZH_TW = "zh_TW",
     }
 
+    /**
+     * 小游戏环境版本枚举
+     * @platform 基础库通用
+     */
+    enum MiniProgramEnvVersion {
+        /** 线上正式版本（空字符串） */
+        RELEASE = "",
+        /** 开发调试版本（对应 IDE 本地调试） */
+        DEV = "dev",
+        /** 开发预览版本（上传至开发者后台的开发预览） */
+        PREDEV = "predev",
+        /** 审核预览版本（提交审核的版本） */
+        PRECHECK = "precheck",
+    }
+
 }

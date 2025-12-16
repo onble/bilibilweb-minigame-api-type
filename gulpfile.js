@@ -4,6 +4,8 @@ const insert = require('gulp-insert');
 const through2 = require('through2');
 const { exec } = require('child_process');
 
+const outputFileName = 'lib.bl.api';
+
 gulp.task('build-types', (cb) => {
     // 先执行合并任务
     const mergeStream = gulp.src(['types/**/*.d.ts'])
@@ -16,14 +18,14 @@ gulp.task('build-types', (cb) => {
             this.push(file);
             callback();
         }))
-        .pipe(concat('bilibili-minigame.d.ts'))
-        .pipe(insert.prepend('declare namespace BilibilWebMinigame {\n'))
-        .pipe(insert.append('\n}\n\ndeclare const bl: BilibilWebMinigame.BL;'))
+        .pipe(concat(`${outputFileName}.d.ts`))
+        .pipe(insert.prepend('/** bilbiliweb的变量命名空间 */\ndeclare namespace BilibilWebMinigame {\n'))
+        .pipe(insert.append('\n}\n\n/** 将bilbiliweb的bl变量声明为全局变量 */\ndeclare const bl: BilibilWebMinigame.BL;'))
         .pipe(gulp.dest('dist/'));
 
     mergeStream.on('end', () => {
         // 合并完成后执行 Prettier 格式化
-        exec('npx prettier --write dist/bilibili-minigame.d.ts', (error, stdout) => {
+        exec(`npx prettier --write dist/${outputFileName}.d.ts`, (error, stdout) => {
             if (error) {
                 console.error('格式化失败:', error);
             } else {
