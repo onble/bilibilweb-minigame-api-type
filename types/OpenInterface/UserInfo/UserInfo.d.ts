@@ -1,12 +1,6 @@
 declare namespace BilibilWebMinigame {
     // ------------------------------ 基础枚举类型 ------------------------------
     /**
-     * 语言枚举（通用）
-     * @platform 基础库通用
-     */
-    type LangType = "en" | "zh_CN" | "zh_TW";
-
-    /**
      * 用户性别枚举
      * @platform 基础库通用
      */

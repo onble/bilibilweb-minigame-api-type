@@ -26,6 +26,19 @@ declare namespace BilibilWebMinigame {
         | "cyan"
         | "magenta"
         | "brown"
-        | "clear";
+        | "clear"; // 透明
+
+    /**
+     * 语言类型枚举（文档提及的 lang 合法值）
+     * @platform 基础库通用
+     */
+    enum LangType {
+        /** 英文 */
+        EN = "en",
+        /** 简体中文 */
+        ZH_CN = "zh_CN",
+        /** 繁体中文 */
+        ZH_TW = "zh_TW",
+    }
 
 }

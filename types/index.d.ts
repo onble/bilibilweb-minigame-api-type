@@ -2443,6 +2443,477 @@ declare namespace BilibilWebMinigame {
 
         //#endregion 设置
 
+        //#region 小游戏互跳
+
+        /**
+         * 展示用于小游戏互跳的按钮（同步方法）
+         * @platform 基础库 2.2.0+（低版本需做兼容处理）
+         * @description 1. 同步方法，调用失败会抛出异常，建议用 try/catch 包裹；2. 需先在后台配置互跳小游戏名单；3. 仅支持配置按钮的 top/left 位置偏移
+         * @param options 按钮位置配置（top/left 均为可选）
+         * @throws 调用失败时抛出异常（如未配置互跳名单、低版本不支持等）
+         * @example
+         * bl.showGameListButton({ top: 0, left: 0 });
+         */
+        showGameListButton: (options?: ShowGameListButtonOptions) => void;
+
+        /**
+         * 隐藏已经展示的小游戏互跳按钮（同步方法）
+         * @platform 基础库 2.2.0+（低版本需做兼容处理）
+         * @description 1. 同步方法，调用失败会抛出异常，建议用 try/catch 包裹；2. 仅能隐藏已通过 showGameListButton 展示的按钮
+         * @throws 调用失败时抛出异常（如未展示按钮、低版本不支持等）
+         * @example
+         * bl.closeGameListButton();
+         */
+        closeGameListButton: () => void;
+
+        //#endregion 小游戏互跳
+
+        //#region  预约游戏
+
+        /**
+         * 获取预约游戏管理器
+         * @platform 基础库 2.9.0+（低版本需做兼容处理）
+         * @returns 游戏预约管理器实例
+         * @example
+         * // 获取游戏预约管理器
+         * const reserveManager = bl.getGameReserveManager();
+         * // 查询预约信息
+         * reserveManager.getReserveInfo({
+         *   success(res) {
+         *     console.log(res.state);
+         *     console.log(res.gameName);
+         *   },
+         *   fail() {
+         *     console.log("reserve game fail...");
+         *   }
+         * });
+         * // ...
+         * // 成功查询预约信息后，用户触发执⾏预约
+         * reserveManager.reserve({
+         *   success(res) {
+         *     console.log(res.state);
+         *   },
+         *   fail(res) {
+         *     console.log(res);
+         *   }
+         * });
+         */
+        getGameReserveManager: () => GameReserveManager;
+
+        //#endregion 预约游戏
+
+        //#region 手游下载
+
+        /**
+         * 获取关联游戏管理器
+         * @platform Android、基础库 3.14.0+、App 6.8.0+（iOS 暂不支持，低版本需兼容）
+         * @returns 关联游戏管理器实例
+         * @example
+         * // 获取关联游戏管理器
+         * var relatedGameManager = bl.getRelatedGameManager();
+         * // 查询关联游戏下载信息
+         * relatedGameManager.getDownloadInfo({
+         *     success(res) {
+         *         // 下载状态：
+         *         // 1 ⽆可下载的⼿游
+         *         // 2 已下载
+         *         // 3 未下载
+         *         console.log(res.state);
+         *         // 可下载⼿游的名称
+         *         console.log(res.gameName);
+         *         // 打开关联⼿游详情⻚
+         *         // Error Codes:
+         *         // 1005 - ⽆可下载游戏
+         *         // 1006 - 未执⾏下载信息查询
+         *         relatedGameManager.showDownloadDetailPage({
+         *             success(res) {
+         *                 // 0 未下载过
+         *                 // 1 已下载过
+         *                 console.log(res.state);
+         *             },
+         *             fail(res) {
+         *                 console.log(res.errCode);
+         *                 console.log(res.errMsg);
+         *             },
+         *             complete(res) {}
+         *         });
+         *     },
+         *     fail(res) {
+         *         console.log(res.errMsg);
+         *     },
+         *     complete(res) {}
+         * });
+         */
+        getRelatedGameManager: () => RelatedGameManager;
+
+        //#endregion 手游下载
+
+        //#region 支付
+
+        /**
+         * 发起充值请求
+         * @platform App >=8.56.0、SDK_Version >=4.2.2（2025年8月15日后低版本不支持支付）
+         * @description 1. 使用前需开通支付权限（申请地址：https://open.biligame.com/#/game/game-mng/game-list）；2. 需从B站游戏开放平台获取支付信息（access-token/access-key）；3. 参数完全透传服务端创建订单接口返回的数据；4. 调用前需完成用户登录+服务端创建订单
+         * @param options 充值请求配置（包含透传参数+必填的 success 回调）
+         * @example
+         * // 第一步：请联系运营确保当前 小游戏对应的 AppID 已经开通支付能力
+         * // 第二步：小游戏登录获取 code
+         * bl.login({
+         *   success({ code }) {
+         *     // 第三步请求业务服务端 生成订单
+         *     //  1. 服务端请求获取 openid，根据移动端请求提供的 code 作为 js_code 参数请求 code2session 接口， 参考文档： http://miniapp.bilibili.com/small-game-doc/open/login/#code2session
+         *     //  2. 服务端完成参数签名并调用下单接口，参考支付指南文档接口 http://miniapp.bilibili.com/small-game-doc/open/recharge/Recharge/，需注意不参与签名的参数
+         *     bl.request({
+         *       url: "https://xxx.com/", // 各业务服务端接口
+         *       method: "",
+         *       header: {},
+         *       data: {
+         *         code, // 需携带 code 参数供后端服务使用
+         *       },
+         *       success(res) {
+         *         // 下单成功
+         *         // 第四步：前端调起支付
+         *         bl.requestRecharge({
+         *           ...res, // 透传后端返回的数据
+         *           success(res) {
+         *             console.log(res.code, res.msg); // 成功情况 code 是 0
+         *           },
+         *           fail(e) {
+         *             console.error(e.code, e.msg);
+         *           },
+         *         });
+         *       },
+         *       fail(res) {
+         *         // 业务后端接口访问失败
+         *       },
+         *     });
+         *   },
+         * });
+         */
+        requestRecharge: (options: RequestRechargeOptions) => void;
+
+        //#endregion 支付
+
+        //#region 开放数据域名
+
+        /**
+         * 获取当前用户托管数据（仅开放数据域可用）
+         * @platform 开放数据域、基础库通用
+         * @description 1. 仅开放数据域可用；2. 调用前需已调用 bl.login；3. 每个用户最多128个KV对
+         * @param options 接口配置（必填 keyList）
+         */
+        getUserCloudStorage: (options: GetUserCloudStorageOptions) => void;
+
+        /**
+         * 删除用户托管数据
+         * @platform 基础库通用
+         * @description 调用前需已调用 bl.login
+         * @param options 接口配置（必填 keyList）
+         */
+        removeUserCloudStorage: (options: RemoveUserCloudStorageOptions) => void;
+
+        /**
+         * 写入用户托管数据
+         * @platform 基础库通用
+         * @description 1. 调用前需已调用 bl.login；2. KVData 需包含 order 字段；3. key+value长度≤1024字节
+         * @param options 接口配置（必填 KVDataList）
+         */
+        setUserCloudStorage: (options: SetUserCloudStorageOptions) => void;
+
+        /**
+         * 拉取当前用户所有关注用户的托管数据（仅开放数据域可用）
+         * @platform 开放数据域、基础库通用
+         * @description 1. 仅开放数据域可用；2. 调用前需已调用 bl.login
+         * @param options 接口配置（必填 keyList）
+         */
+        getFollowingCloudStorage: (options: GetFollowingCloudStorageOptions) => void;
+
+        /**
+         * 获取所有成员的游戏数据（仅开放数据域可用）
+         * @platform 开放数据域、基础库通用
+         * @description 1. 仅开放数据域可用；2. 调用前需已调用 bl.login；3. 按 order 倒序取前100名
+         * @param options 接口配置（必填 keyList）
+         */
+        getAllCloudStorage: (options: GetAllCloudStorageOptions) => void;
+
+        /**
+         * 获取开放数据域
+         * @platform 基础库通用
+         * @returns 开放数据域实例
+         */
+        getOpenDataContext: () => OpenDataContext;
+
+        /**
+         * 关注排行榜用户（仅开放数据域可用）
+         * @platform 开放数据域、基础库 2.5.0+（低版本需兼容）
+         * @description 1. 仅开放数据域可用；2. 需在 getAllCloudStorage 成功获取排行榜后调用
+         * @param options 接口配置（必填 data）
+         * @example
+         * // 开放域中
+         * let dataList = []; // 用来保存所获取的排行榜数据
+         * 
+         * bl.getAllCloudStorage({
+         *     keyList: ['score2', 'score1'],
+         *     success(res) {
+         *         dataList = res.data[0].singleUserGameDataList;
+         *     },
+         * });
+         * 
+         * function follow(n) {
+         *     bl.followCloudUpper({
+         *         data: dataList[n], // 想要关注的用户所对应的数据块
+         *         success(res) {
+         *             console.info('follow success', res);
+         *         },
+         *         fail(res) {
+         *             console.info('follow fail', res);
+         *         },
+         *     });
+         * }
+         */
+        followCloudUpper: (options: FollowCloudUpperOptions) => void;
+
+        /**
+         * 监听主域发送的消息（开放数据域内调用）
+         * @platform 开放数据域、基础库通用
+         * @param callback 消息回调函数
+         */
+        onMessage: (callback: (message: { [key: string]: PrimitiveValue | { [key: string]: PrimitiveValue } }) => void) => void;
+
+        //#endregion 开放数据域名
+
+        //#region 订阅消息
+
+        /**
+         * 调起客户端小游戏订阅消息界面
+         * @platform 基础库 3.1.0+（低版本需做兼容处理）
+         * @description 1. 仅面向已上架游戏（首次上架接入会被驳回）；2. 首次接入版本更新订阅卡不可勾选【大版本】；3. 需用户点击/支付后调起；4. 单次最多订阅5条模板；5. 冷启仅能弹1次订阅面板；6. 用户勾选"不再询问"后模板会进入设置页
+         * @param options 订阅配置（必填 tmplIds）
+         * @example
+         * bl.onTouchEnd(() => {
+         *   bl.requestSubscribeMessage({
+         *     tmplIds: [""],
+         *     success(res) {}
+         *   });
+         * });
+         * 
+         * bl.requestRecharge({
+         *   complete() {
+         *     bl.requestSubscribeMessage({
+         *       tmplIds: [""],
+         *       success(res) {}
+         *     });
+         *   }
+         * });
+         */
+        requestSubscribeMessage: (options: RequestSubscribeMessageOptions) => void;
+
+        //#endregion 订阅消息
+
+        //#region 意见反馈
+
+        /**
+         * 创建打开意见反馈页面的按钮
+         * @platform 基础库 2.3.0+（低版本需做兼容处理）
+         * @description 1. type=image 时背景贴图会拉伸至按钮宽高；2. lineHeight 在 iOS/Android 均不起作用；3. 颜色值支持 hex 码和预设颜色名
+         * @param options 按钮配置参数
+         * @returns 意见反馈按钮实例
+         * @example
+         * let button = bl.createFeedbackButton({
+         *   type: 'text',
+         *   text: '打开意见反馈页面',
+         *   style: {
+         *     left: 10,
+         *     top: 76,
+         *     width: 200,
+         *     height: 40,
+         *     lineHeight: 40,
+         *     backgroundColor: '#ff0000',
+         *     color: '#ffffff',
+         *     textAlign: 'center',
+         *     fontSize: 16,
+         *     borderRadius: 4
+         *   }
+         * })
+         */
+        createFeedbackButton: (options?: CreateFeedbackButtonOptions) => FeedbackButton;
+
+        //#endregion 意见反馈
+
+        //#region 角色创建上报
+
+        /**
+         * 角色创建后上报角色信息
+         * @platform 基础库通用
+         * @description 1. 用户进入游戏服务区、角色创建后调用；2. 重复创建会返回 83000005 错误码；3. serverId/serverName/roleId 为必填项
+         * @param options 角色上报配置（必填 serverId/serverName/roleId）
+         * @example
+         * bl.createRole({
+         *     serverId: '1234',
+         *     serverName: 'b站服一区',
+         *     roleId: '123456',
+         *     success: function(res){
+         *         console.log(res, 'success')
+         *     },
+         *     fail: function(err){
+         *         console.log(err, 'fail')
+         *     }
+         * })
+         */
+        createRole: (options: CreateRoleOptions) => void;
+
+        //#endregion 角色创建上报
+
+        //#region 敏感词查询
+
+        /**
+         * 敏感词查询接口
+         * @platform 基础库通用
+         * @description 1. 检测文本中的敏感词，包含则将敏感词替换为*；2. result=0 无敏感词（返回原文），result=1 包含敏感词（返回替换后文本）
+         * @param options 检测配置（必填 content）
+         * @example
+         * bl.sensitiveWordCheck({
+         *     content: '敏感词查询',
+         *     success: function(res){
+         *         console.log(res, 'success');    
+         *     },
+         *     fail: function(err){
+         *         console.log(err, 'fail');
+         *     }
+         * })
+         */
+        sensitiveWordCheck: (options: SensitiveWordCheckOptions) => void;
+
+        //#endregion 敏感词查询
+
+        //#region 账号信息
+
+        /**
+         * 获取当前帐号信息（异步版本）
+         * @platform 基础库通用
+         * @description 异步获取小游戏 appId 和环境版本（release/dev/predev/precheck）
+         * @param options 异步接口配置（可选回调）
+         * @example
+         * bl.getAccountInfo({
+         *   success(res) {
+         *     console.log(res.miniProgram)
+         *     console.log(res.miniProgram.appId)
+         *     console.log(res.miniProgram.envVersion)
+         *   }
+         * })
+         */
+        getAccountInfo: (options?: GetAccountInfoOptions) => void;
+
+        /**
+         * 获取当前帐号信息（同步版本）
+         * @platform 基础库通用
+         * @description 同步获取小游戏 appId 和环境版本，失败会抛出异常需 try/catch 捕获
+         * @returns 小游戏账号信息
+         * @throws {BluetoothErrorResult} 获取失败时抛出异常
+         * @example
+         * try {
+         *     const res = bl.getAccountInfoSync()
+         *     console.log(res.miniProgram)
+         *     console.log(res.miniProgram.appId)
+         *     console.log(res.miniProgram.envVersion)
+         * } catch (e) {
+         *   // Do something when catch error
+         * }
+         */
+        getAccountInfoSync: () => GetAccountInfoSyncResult;
+
+        //#endregion 账号信息
+
+        //#region 人脸检测
+
+        /**
+         * 获取 FaceDetection 引擎模块（仅 Android 支持）
+         * @platform 仅 Android 支持（iOS 无此功能）
+         * @description 1. modelSelection=0 适配2米内面部检测，=1 适配5米内；2. 需调用 close() 释放引擎资源；3. 图像数据为 RGBA 一维数组（每4项一个像素）
+         * @param options 引擎创建配置（可选 modelSelection + 回调）
+         * @example
+         * let faceDetection;
+         * bl.createFaceDetection({modelSelection:0, success:(res) => {
+         *     console.log('createFaceDetection success', res) ; 
+         *     faceDetection = res;
+         * }, fail:(res) => {
+         *     console.log('createFaceDetection fail', JSON.stringify(res))   
+         * }})
+         */
+        createFaceDetection: (options?: CreateFaceDetectionOptions) => void;
+
+        //#endregion 人脸检测
+
+        //#region 【必接】侧边栏能力
+
+        /**
+         * 检测当前宿主版本是否支持跳转指定小游戏入口场景（目前仅支持侧边栏）
+         * @platform 基础库 3.99.5+（低版本需做兼容处理）
+         * @description 1. 仅支持 scene='sidebar'；2. 成功回调返回 isExist 标识场景是否存在；3. 错误码20001为参数校验错误
+         * @param options 场景检测配置
+         * @example
+         * bl.navigateToScene({
+         *     scene: "sidebar",
+         *     success: (res) => {
+         *         console.log("navigate to scene success");
+         *         // 跳转成功回调逻辑
+         *     },
+         *     fail: (res) => {
+         *         console.log("navigate to scene fail: ", res);
+         *         // 跳转失败回调逻辑
+         *     },
+         * });
+         */
+        checkScene: (options?: CheckSceneOptions) => void;
+
+        /**
+         * 跳转到指定小游戏入口场景（目前仅支持侧边栏）
+         * @platform 基础库 3.99.5+（低版本需做兼容处理）
+         * @description 1. 仅支持 scene='sidebar'；2. 错误码20001为参数错误，21101为场景不可达；3. 需先通过 checkScene 检测场景是否存在
+         * @param options 场景跳转配置
+         */
+        navigateToScene: (options?: NavigateToSceneOptions) => void;
+
+        //#endregion 【必接】侧边栏能力
+
+        //#region 添加到桌面
+
+        /**
+         * 添加小游戏快捷方式到手机桌面
+         * @platform 基础库 3.99.4+（低版本需做兼容处理）
+         * @description 1. 无入参，仅需回调配置；2. 桌面快捷方式礼包需每日可领取（同游戏内签到礼包）
+         * @param options 接口配置（可选回调）
+         * @example
+         * bl.addShortcut({
+         *   success() {
+         *     console.log("添加桌面成功");
+         *   },
+         *   fail(err) {
+         *     console.log("添加桌面失败", err.errMsg);
+         *   },
+         * });
+         */
+        addShortcut: (options?: AddShortcutOptions) => void;
+
+        /**
+         * 检查小游戏快捷方式是否已添加到手机桌面
+         * @platform 基础库 3.99.4+（低版本需做兼容处理）、仅 Android 支持
+         * @description 1. 仅 Android 支持；2. 成功回调返回 status.exist 标识是否已添加；3. 桌面快捷方式礼包需每日可领取（同游戏内签到礼包）
+         * @param options 接口配置（可选回调）
+         * @example
+         * bl.checkShortcut({
+         *   success(res) {
+         *     console.log("检查快捷方式", res.status);
+         *   },
+         *   fail(res) {
+         *     console.log("检查快捷方式失败", res.errMsg);
+         *   },
+         * });
+         */
+        checkShortcut: (options?: CheckShortcutOptions) => void;
+
+        //#endregion 添加到桌面
+
         //#endregion 开放接口
     }
 }
